@@ -7,6 +7,11 @@ import "../global.css"
 import {useEffect} from "react";
 
 
+import { ClerkProvider } from '@clerk/clerk-expo'
+
+import { tokenCache } from '@clerk/clerk-expo/token-cache'
+
+
 export default function RootLayout() {
     const [loaded] = useFonts({
         "Jakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
@@ -30,6 +35,7 @@ export default function RootLayout() {
     }
 
   return (
+      <ClerkProvider tokenCache={tokenCache}>
     <ThemeProvider value={DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -39,5 +45,6 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
+      </ClerkProvider>
   );
 }
