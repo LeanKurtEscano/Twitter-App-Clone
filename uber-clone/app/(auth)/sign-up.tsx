@@ -50,18 +50,30 @@ const SignUp = () => {
             const completeSignUp = await signUp.attemptEmailAddressVerification({
                 code: verification.code,
             });
-            if (completeSignUp.status === "complete") {
 
+            if (completeSignUp.status === "complete") {
                 const json_data = {
                     "name": form.name,
                     "email": form.email,
                     "clerkId": completeSignUp.createdUserId
                 }
 
-                const response = userAuthApi.post("/register",json_data);
+                // Separate try-catch for API call
+                try {
+                    console.log("🚀 Making API call to backend...");
+                    console.log("📦 Data:", json_data);
 
+                    const response = await userAuthApi.post("/register", json_data);
+                    console.log("✅ Backend response:", response.data);
+                } catch (apiError: any) {
 
+                    console.log("Error:", apiError.message);
+                    console.log("Response:", apiError.response?.data);
+                    console.log("Status:", apiError.response?.status);
+                    // Don't return here - continue with Clerk setup even if backend fails
+                }
 
+                // Continue with Clerk setup regardless of API success/failure
                 await setActive({ session: completeSignUp.createdSessionId });
                 setVerification({
                     ...verification,
@@ -75,8 +87,8 @@ const SignUp = () => {
                 });
             }
         } catch (err: any) {
-            // See https://clerk.com/docs/custom-flows/error-handling
-            // for more info on error handling
+            // This should only catch Clerk errors now
+            console.log("❌ Clerk error:", err);
             setVerification({
                 ...verification,
                 error: err.errors[0].longMessage,
@@ -186,7 +198,9 @@ const SignUp = () => {
                         </Text>
                         <CustomButton
                             title="Browse Home"
-                            onPress={() => router.push(`/(root)/(tabs)/home`)}
+                            onPress={() =>{setShowSuccessModal(false)
+                                router.push(`/(root)/(tabs)/home`) }
+                                }
                             className="mt-5"
                         />
                     </View>
