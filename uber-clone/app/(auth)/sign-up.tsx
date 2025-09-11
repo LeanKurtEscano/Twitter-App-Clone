@@ -8,7 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { fetchAPI } from "@/lib/fetch";
+import {userAuthApi} from "@/config/apiConfig";
 
 const SignUp = () => {
     const { isLoaded, signUp, setActive } = useSignUp();
@@ -51,7 +51,17 @@ const SignUp = () => {
                 code: verification.code,
             });
             if (completeSignUp.status === "complete") {
-               // send data to autth controller springboot
+
+                const json_data = {
+                    "name": form.name,
+                    "email": form.email,
+                    "clerkId": completeSignUp.createdUserId
+                }
+
+                const response = userAuthApi.post("/register",json_data);
+
+
+
                 await setActive({ session: completeSignUp.createdSessionId });
                 setVerification({
                     ...verification,
