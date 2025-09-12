@@ -1,5 +1,5 @@
 //import { useSignIn } from "@clerk/clerk-expo";
-import { Link, router } from "expo-router";
+import {Link, router, useRouter} from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 
@@ -7,18 +7,43 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-
+import { useSignIn } from '@clerk/clerk-expo'
 const SignIn = () => {
-   // const { signIn, setActive, isLoaded } = useSignIn();
+   const { signIn, setActive, isLoaded } = useSignIn();
+
+   const router = useRouter();
 
     const [form, setForm] = useState({
         email: "",
         password: "",
     });
 
-    const onSignInPress = useCallback(async () => {
+    const onSignInPress = async () => {
+        if (!isLoaded) return
 
-    }, [ form]);
+        // Start the sign-in process using the email and password provided
+        try {
+            const signInAttempt = await signIn.create({
+                identifier: form.email,
+                password: form.password,
+            })
+
+            // If sign-in process is complete, set the created session as active
+            // and redirect the user
+            if (signInAttempt.status === 'complete') {
+                await setActive({ session: signInAttempt.createdSessionId })
+                router.replace('/')
+            } else {
+                // If the status isn't complete, check why. User might need to
+                // complete further steps.
+                console.error(JSON.stringify(signInAttempt, null, 2))
+            }
+        } catch (err) {
+            // See https://clerk.com/docs/custom-flows/error-handling
+            // for more info on error handling
+            console.error(JSON.stringify(err, null, 2))
+        }
+    }
 
     return (
         <ScrollView className="flex-1 bg-white">
