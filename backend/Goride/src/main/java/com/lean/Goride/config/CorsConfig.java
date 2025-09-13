@@ -16,7 +16,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
 
-        // ✅ Allow both localhost and LAN IP for Expo
+       
         config.addAllowedOriginPattern("*");
 
         config.setAllowedHeaders(List.of("*"));
