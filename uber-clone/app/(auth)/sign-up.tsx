@@ -95,7 +95,7 @@ const SignUp = () => {
         }
     };
 
-    const handleCodeChange = (code) => {
+    const handleCodeChange = (code:string) => {
         setVerificationCode(code);
         if (verificationError) {
             setVerificationError("");
