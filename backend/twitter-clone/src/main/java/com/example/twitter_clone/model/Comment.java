@@ -1,5 +1,6 @@
 package com.example.twitter_clone.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -21,11 +22,13 @@ public class Comment {
     // User who made the comment
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"followers", "following"})
     private User user;
 
     // Post that this comment belongs to
     @ManyToOne(optional = false)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnoreProperties({"comments", "likes"})
     private Post post;
 
     @Column(length = 280, nullable = false)
@@ -39,6 +42,7 @@ public class Comment {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments"})
     private Set<User> likes = new HashSet<>();
 
     @Column(updatable = false)

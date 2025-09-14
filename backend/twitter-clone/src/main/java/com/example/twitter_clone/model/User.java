@@ -2,6 +2,7 @@ package com.example.twitter_clone.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -54,6 +55,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
     @Builder.Default
+    @JsonIgnoreProperties({"followers", "following"})
     private Set<User> followers = new HashSet<>();
 
     // Following (self-referencing many-to-many)
@@ -64,6 +66,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
     @Builder.Default
+    @JsonIgnoreProperties({"followers", "following"})
     private Set<User> following = new HashSet<>();
 
     @Column(updatable = false)
