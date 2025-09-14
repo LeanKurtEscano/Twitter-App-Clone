@@ -6,13 +6,18 @@ import {
     FlatList,
     ActivityIndicator,
 } from "react-native";
-import {SignedIn, SignedOut, useUser} from "@clerk/clerk-expo";
+import {SignedIn, SignedOut, useAuth, useUser} from "@clerk/clerk-expo";
 import {Link} from "expo-router";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GoogleTextInput from "@/components/GoogleTextInput";
+
 import Map from "@/components/Map";
+import {useLocationStore} from "@/store";
+import {useEffect, useState} from "react";
+import * as Location from "expo-location";
+import { router } from "expo-router";
+
 const recentRides = [
     {
         "ride_id": "1",
@@ -114,6 +119,12 @@ const recentRides = [
 
 const Home = () => {
 
+    const { setUserLocation, setDestinationLocation } = useLocationStore();
+    const loading = false
+    const { signOut } = useAuth();
+    const { user } = useUser();
+
+    const [hasPermissions, setHasPermissions] = useState(false);
 
 
     const handleDestinationPress = () => {
@@ -121,14 +132,48 @@ const Home = () => {
 
     }
     const handleSignOut = () => {
-
+        signOut();
+        router.replace("/(auth)/sign-in");
     }
-    const loading = false
 
-    const { user } = useUser();
+    useEffect(() => {
+        const requestLocation = async() => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+
+            if(status !== 'granted') {
+                setHasPermissions(false);
+                return;
+            }
+
+            try {
+                let location = await Location.getCurrentPositionAsync();
+                const address = await Location.reverseGeocodeAsync({
+                    latitude: location.coords?.latitude!,
+                    longitude: location.coords?.longitude!,
+                });
+
+                // 🔧 FIX: Check if address array has elements before accessing
+                const locationAddress = address && address.length > 0
+                    ? `${address[0]?.name || "Unknown"}, ${address[0]?.region || "Unknown"}`
+                    : "Location not available";
+
+                setUserLocation({
+                    latitude: location.coords?.latitude,
+                    longitude: location.coords?.longitude,
+                    address: locationAddress, // Use the safe address
+                });
+
+            } catch (error) {
+                console.error("Location error:", error);
+                setHasPermissions(false);
+            }
+        };
+
+        requestLocation();
+    }, [])
     return(
         <SafeAreaView>
-            <FlatList data = {recentRides.slice(0,5)}
+            <FlatList data = {Array.isArray(recentRides) ? recentRides.slice(0,5) : []}
              renderItem = {({item}) => <RideCard ride = {item} />}
              ListEmptyComponent = {() => (
                  <View className="flex flex-col items-center justify-center">
@@ -147,9 +192,7 @@ const Home = () => {
                 <>
                     <View className  = "flex flex-row items-center justify-between my-5">
                         <Text className="text-2xl capitalize font-JakartaExtraBold">
-
-                                Welcome{", "}
-                                {user?.firstName || user?.emailAddresses[0]?.emailAddress.split("@")[0]}{" "}
+                                Welcome {user?.firstName}👋
                                 👋
 
 
@@ -161,10 +204,7 @@ const Home = () => {
 
                     </View>
 
-                    <GoogleTextInput icon={icons.search}
-                     containerStyle = "bg-white shadow-md shadow-neutral-300"
-                                     handlePress={handleDestinationPress}
-                    />
+
 
                     <>
                         <Text className="text-xl font-JakartaSemiBold mt-5 mb-3">

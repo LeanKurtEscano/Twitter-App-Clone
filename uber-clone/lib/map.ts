@@ -1,6 +1,7 @@
-import { Driver, MarkerData } from "@/types/type";
+import {Driver, MarkerData} from "@/types/type";
 
-const directionsAPI = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY;
+// Using OSRM public demo server - consider hosting your own for production
+const OSRM_BASE_URL = "https://router.project-osrm.org/route/v1/driving";
 
 export const generateMarkersFromData = ({
                                             data,
@@ -72,6 +73,26 @@ export const calculateRegion = ({
     };
 };
 
+// Helper function to get route data from OSRM
+const getOSRMRoute = async (startLng: number, startLat: number, endLng: number, endLat: number) => {
+    const url = `${OSRM_BASE_URL}/${startLng},${startLat};${endLng},${endLat}?overview=false&steps=false`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`OSRM API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+        throw new Error('No route found');
+    }
+
+    return {
+        duration: data.routes[0].duration, // Duration in seconds
+        distance: data.routes[0].distance  // Distance in meters
+    };
+};
+
 export const calculateDriverTimes = async ({
                                                markers,
                                                userLatitude,
@@ -95,27 +116,37 @@ export const calculateDriverTimes = async ({
 
     try {
         const timesPromises = markers.map(async (marker) => {
-            const responseToUser = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`,
+            // Get route from driver to user
+            const routeToUser = await getOSRMRoute(
+                marker.longitude,
+                marker.latitude,
+                userLongitude,
+                userLatitude
             );
-            const dataToUser = await responseToUser.json();
-            const timeToUser = dataToUser.routes[0].legs[0].duration.value; // Time in seconds
 
-            const responseToDestination = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`,
+            // Get route from user to destination
+            const routeToDestination = await getOSRMRoute(
+                userLongitude,
+                userLatitude,
+                destinationLongitude,
+                destinationLatitude
             );
-            const dataToDestination = await responseToDestination.json();
-            const timeToDestination =
-                dataToDestination.routes[0].legs[0].duration.value; // Time in seconds
 
-            const totalTime = (timeToUser + timeToDestination) / 60; // Total time in minutes
+            const totalTime = (routeToUser.duration + routeToDestination.duration) / 60; // Total time in minutes
+            const totalDistance = (routeToUser.distance + routeToDestination.distance) / 1000; // Total distance in km
             const price = (totalTime * 0.5).toFixed(2); // Calculate price based on time
 
-            return { ...marker, time: totalTime, price };
+            return {
+                ...marker,
+                time: totalTime,
+                price,
+                distance: totalDistance
+            };
         });
 
         return await Promise.all(timesPromises);
     } catch (error) {
         console.error("Error calculating driver times:", error);
+        return markers; // Return original markers if calculation fails
     }
 };
