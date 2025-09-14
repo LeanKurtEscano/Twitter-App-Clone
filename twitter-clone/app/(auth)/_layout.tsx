@@ -1,21 +1,12 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import {SplashScreen, Stack} from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-import "../../global.css"
+import { Redirect, Stack } from 'expo-router'
+import { useAuth } from '@clerk/clerk-expo'
 
+export default function AuthRoutesLayout() {
+    const { isSignedIn } = useAuth()
 
-const Layout = () => {
+    if (isSignedIn) {
+        return <Redirect href={'/'} />
+    }
 
-
-    return (
-        <Stack>
-            <Stack.Screen name="welcome" options={{ headerShown: false }} />
-            <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-            <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-
-        </Stack>
-    );
+    return <Stack />
 }
-
-export default Layout;
