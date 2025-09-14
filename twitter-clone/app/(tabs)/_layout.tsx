@@ -1,11 +1,17 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { Tabs } from 'expo-router'
-
+import { Redirect, Tabs } from 'expo-router'
+import { useAuth } from '@clerk/clerk-expo'
 import Feather from '@expo/vector-icons/Feather'
 const TabsLayout = () => {
+
+    const {isSignedIn} = useAuth()
+
+    if(!isSignedIn) {
+        return <Redirect href={'/(auth)'} />
+    }
   return (
-    <Tabs>
+    <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: '#1DA1F2' }}>
         <Tabs.Screen name="index" 
         options={{ tabBarIcon: ({color,size}) => <Feather name='home' size={size} color={color}/> }} />
         <Tabs.Screen name="search" options={{ tabBarIcon: ({color,size}) => <Feather name='search' size={size} color={color}/> }} />
