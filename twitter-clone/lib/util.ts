@@ -1,46 +1,23 @@
-import { Ride } from "@/types/type";
+import { differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
 
-export const sortRides = (rides: Ride[]): Ride[] => {
-    const result = rides.sort((a, b) => {
-        const dateA = new Date(`${a.created_at}T${a.ride_time}`);
-        const dateB = new Date(`${b.created_at}T${b.ride_time}`);
-        return dateB.getTime() - dateA.getTime();
-    });
-
-    return result.reverse();
+// Format a number to a shorter format (e.g., 1000 -> 1K)
+export const formatNumber = (num: number): string => {
+  if (num >= 1000) return Math.floor(num / 1000) + "K";
+  return num.toString();
 };
 
-export function formatTime(minutes: number): string {
-    const formattedMinutes = +minutes?.toFixed(0) || 0;
+//  Format a date to a short relative format (e.g., 2m, 1h, 3d)
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
 
-    if (formattedMinutes < 60) {
-        return `${minutes} min`;
-    } else {
-        const hours = Math.floor(formattedMinutes / 60);
-        const remainingMinutes = formattedMinutes % 60;
-        return `${hours}h ${remainingMinutes}m`;
-    }
-}
+  const minutes = differenceInMinutes(now, date);
+  const hours = differenceInHours(now, date);
+  const days = differenceInDays(now, date);
 
-export function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-
-    return `${day < 10 ? "0" + day : day} ${month} ${year}`;
-}
+  if (minutes < 1) return "now";
+  if (minutes < 60) return `${minutes}m`;
+  if (hours < 24) return `${hours}h`;
+  if (days < 7) return `${days}d`;
+  return `${Math.floor(days / 7)}w`;
+};
