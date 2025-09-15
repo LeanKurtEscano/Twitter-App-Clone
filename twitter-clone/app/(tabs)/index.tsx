@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import SignOutButton from '@/components/SignOutButton'
 import { Ionicons } from '@expo/vector-icons'
 import PostComposer from '@/components/PostComposer'
+import PostsList from '@/components/PostsList'
 
 const HomeScreen = () => {
   return (
@@ -20,6 +21,7 @@ const HomeScreen = () => {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}>
             <PostComposer/>
+            <PostsList/>
 
       </ScrollView>
       
