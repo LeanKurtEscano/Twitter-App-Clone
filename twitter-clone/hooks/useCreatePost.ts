@@ -1,48 +1,89 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert } from "react-native";
+import { Alert,Linking } from "react-native";
 
 import * as ImagePicker from "expo-image-picker";
-
+import { useUser } from "@clerk/clerk-expo";
 import { useApiClient } from "@/config/axiosInstance";
 
 export const useCreatePost = () => {
     const [content, setContent] = useState("");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+     const { user } = useUser();
     const queryClient = useQueryClient();
+
+    const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
+    const CLOUDINARY_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_PRESET;
+     const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
+     const uploadToCloudinary = async (imageUri: string): Promise<string> => {
+        try {
+            const formData = new FormData();
+        
+            const uriParts = imageUri.split('.');
+            const fileType = uriParts[uriParts.length - 1].toLowerCase();
+            
+            formData.append('file', {
+                uri: imageUri,
+                type: `image/${fileType}`,
+                name: `upload.${fileType}`,
+            } as any);
+            
+            formData.append('upload_preset', CLOUDINARY_PRESET ?? "");
+            
+
+            const response = await fetch(CLOUDINARY_URL ?? "", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            return data.secure_url; 
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            throw new Error('Failed to upload image to Cloudinary');
+        }
+    };
 
 
     const createPostMutation = useMutation({
          mutationFn: async (postData: { content: string; imageUri: string | null }) => {
-            const formData = new FormData();
+         
 
-            const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
+           
 
-            if(postData.content) formData.append("content", postData.content);
-            if(postData.imageUri) {
-                const uriParts= postData.imageUri.split('.');
-                const fileType = uriParts[uriParts.length - 1].toLowerCase();
+             let imageUrl: string | null = null;
 
-                const mimeTypeMap: Record<string, string> = {
-                   
-                    png: 'image/png',
-                    gif: 'image/gif',
-                    webp:'image/webp'
-                };
-
-
-                const mimeType = mimeTypeMap[fileType] || 'image/jpeg';
-
-                formData.append("image", {
-                    uri: postData.imageUri,
-                    name: `image.${fileType}`,
-                    type: mimeType
-                } as any);
-
-                  return postApi.post("/posts", formData, {
-                headers: {"Content-Type": "multipart/form-data"}
-            });
+                 if (postData.imageUri) {
+                imageUrl = await uploadToCloudinary(postData.imageUri);
+              
             }
+
+              const requestData = {
+                clerkUserId: user?.id,
+                content: postData.content,
+                image: imageUrl,
+            };
+
+            const response = await postApi.post("/posts", requestData, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            return response;
+          
 
     },
 
@@ -58,40 +99,68 @@ export const useCreatePost = () => {
         }
     });
 
-    const handleImagePicker = async (useCamera: boolean = false) => {
-        const permissionResult = useCamera
-            ? await ImagePicker.requestCameraPermissionsAsync()
-            : await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const handleImagePicker = async (useCamera: boolean = false) => {
+        try {
+          
+            const currentPermission = useCamera
+                ? await ImagePicker.getCameraPermissionsAsync()
+                : await ImagePicker.getMediaLibraryPermissionsAsync();
 
+            let permissionResult = currentPermission;
 
-            if(permissionResult.status !== 'granted') {
-                const source = useCamera ? 'camera' : 'photo library';
-                Alert.alert("Permission needed", `Please grant permission to access your ${source}`);
-                return;
+         
+            if (currentPermission.status !== 'granted') {
+                permissionResult = useCamera
+                    ? await ImagePicker.requestCameraPermissionsAsync()
+                    : await ImagePicker.requestMediaLibraryPermissionsAsync();
             }
 
-            const pickerOptions = {
+            // Handle permission denial
+            if (permissionResult.status !== 'granted') {
+                const source = useCamera ? 'camera' : 'photo library';
+                
+                // Check if user denied with "Don't ask again"
+                if (!permissionResult.canAskAgain) {
+                    Alert.alert(
+                        "Permission Required",
+                        `Permission to access ${source} was permanently denied. Please enable it in your device settings.`,
+                        [
+                            { text: "Cancel", style: "cancel" },
+                            { text: "Open Settings", onPress: () => Linking.openSettings() }
+                        ]
+                    );
+                } else {
+                    Alert.alert(
+                        "Permission needed", 
+                        `Please grant permission to access your ${source}`
+                    );
+                }
+                return; // Important: Return early to prevent further execution
+            }
+
+            const pickerOptions: ImagePicker.ImagePickerOptions = {
                 allowsEditing: true,
                 aspect: [16, 9] as [number, number],
                 quality: 0.8,
-            }
+            };
 
             const result = useCamera
                 ? await ImagePicker.launchCameraAsync(pickerOptions)
                 : await ImagePicker.launchImageLibraryAsync({
-                    ...pickerOptions, mediaTypes: ["images"],
+                    ...pickerOptions, 
+                    mediaTypes: ["images"],
                 });
 
-
-            if(!result.canceled) {
+            if (!result.canceled && result.assets && result.assets.length > 0) {
                 setSelectedImage(result.assets[0].uri);
             }
 
+        } catch (error) {
+            console.error("Error in image picker:", error);
+            Alert.alert("Error", "Something went wrong while accessing the image picker.");
+        }
+    };
 
-         
-
-
-    }
 
      const createPost = () => {
                 if(!content.trim() && !selectedImage) {

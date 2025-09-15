@@ -18,8 +18,17 @@ const HomeScreen = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 80 }}/>
-        <PostComposer/>
+        contentContainerStyle={{ paddingBottom: 80 }}>
+            <PostComposer/>
+
+      </ScrollView>
+      
+        
+
+
+
+
+
     </SafeAreaView>
   )
 }
