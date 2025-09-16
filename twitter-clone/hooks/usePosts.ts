@@ -11,7 +11,7 @@ export const usePosts = () => {
     const { data: postsData, isLoading, error,refetch } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await postApi.get('/');
+            const response = await postApi.get('/allPosts');
             return response.data;
         }
     });

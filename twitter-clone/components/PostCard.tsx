@@ -13,7 +13,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: PostCardProps) => {
-  const isOwnPost = post.user._id === currentUser._id;
+  const isOwnPost = post.user.id === currentUser.id;
 
   const handleDelete = () => {
     Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
@@ -21,8 +21,8 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => onDelete(post._id),
-      },
+        onPress: () => onDelete(post.id),
+      }
     ]);
   };
 
@@ -51,11 +51,11 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
             )}
           </View>
 
-          {post.content && (
+          {post?.content && (
             <Text className="text-gray-900 text-base leading-5 mb-3">{post.content}</Text>
           )}
 
-          {post.image && (
+          {post?.image && (
             <Image
               source={{ uri: post.image }}
               className="w-full h-48 rounded-2xl mb-3"
@@ -76,7 +76,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
               <Text className="text-gray-500 text-sm ml-2">0</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center" onPress={() => onLike(post._id)}>
+            <TouchableOpacity className="flex-row items-center" onPress={() => onLike(post.id)}>
               {isLiked ? (
                 <AntDesign name="heart" size={18} color="#E0245E" />
               ) : (

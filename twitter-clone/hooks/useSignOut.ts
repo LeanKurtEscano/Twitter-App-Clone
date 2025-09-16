@@ -1,7 +1,8 @@
 import { useClerk } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 
-export const useSignOut = () => {
+export const useSignOut = (clerkId: String) => {
   const { signOut } = useClerk();
 
   const handleSignOut = () => {
@@ -10,7 +11,11 @@ export const useSignOut = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => signOut(),
+        onPress: () => {
+          AsyncStorage.removeItem(`synced_${clerkId}`);
+          signOut();
+        },
+
       },
     ]);
   };

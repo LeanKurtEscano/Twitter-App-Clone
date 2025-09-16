@@ -1,5 +1,5 @@
 export interface User {
-  _id: string;
+  id: string;
   username: string;
   firstName: string;
   lastName: string;
@@ -7,14 +7,14 @@ export interface User {
 }
 
 export interface Comment {
-  _id: string;
+  id: string;
   content: string;
   createdAt: string;
   user: User;
 }
 
 export interface Post {
-  _id: string;
+  id: string;
   content: string;
   image?: string;
   createdAt: string;
@@ -24,7 +24,7 @@ export interface Post {
 }
 
 export interface Notification {
-  _id: string;
+  id: string;
   from: {
     username: string;
     firstName: string;
@@ -34,12 +34,12 @@ export interface Notification {
   to: string;
   type: "like" | "comment" | "follow";
   post?: {
-    _id: string;
+    id: string;
     content: string;
     image?: string;
   };
   comment?: {
-    _id: string;
+    id: string;
     content: string;
   };
   createdAt: string;

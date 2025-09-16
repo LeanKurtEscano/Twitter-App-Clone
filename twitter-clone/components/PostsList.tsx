@@ -10,7 +10,7 @@ const PostsList = () => {
   const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-  const selectedPost = selectedPostId ? posts.find((p: Post) => p._id === selectedPostId) : null;
+  const selectedPost = selectedPostId ? posts.find((p: Post) => p.id === selectedPostId) : null;
 
   if (isLoading) {
     return (
@@ -44,11 +44,11 @@ const PostsList = () => {
     <>
       {posts?.map((post: Post) => (
         <PostCard
-          key={post._id}
+          key={post.id}
           post={post}
           onLike={toggleLike}
           onDelete={deletePost}
-          onComment={(post: Post) => setSelectedPostId(post._id)}
+          onComment={(post: Post) => setSelectedPostId(post.id)}
           currentUser={currentUser}
           isLiked={checkIsLiked(post.likes, currentUser)}
         />

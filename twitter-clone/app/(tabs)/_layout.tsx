@@ -5,6 +5,10 @@ import { useAuth } from '@clerk/clerk-expo'
 import Feather from '@expo/vector-icons/Feather'
 const TabsLayout = () => {
 
+  const { getToken } = useAuth();
+
+  console.log(getToken());
+
     const {isSignedIn} = useAuth()
 
     if(!isSignedIn) {
