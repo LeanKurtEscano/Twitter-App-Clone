@@ -36,6 +36,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
+    private String provider;
+
     @Column(columnDefinition = "TEXT DEFAULT ''")
     private String profilePicture;
 

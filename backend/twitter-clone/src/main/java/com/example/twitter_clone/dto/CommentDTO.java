@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class CommentDTO {
-    private Long userId;   // who is commenting
+    private String clerkUserId;   // who is commenting
     private Long postId;   // which post
     private String content;
 }

@@ -4,6 +4,9 @@ package com.example.twitter_clone.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,7 +48,6 @@ public class Post {
 
     // Comments (one post has many comments)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"post"})
     @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 

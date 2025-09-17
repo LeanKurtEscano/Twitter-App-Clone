@@ -3,6 +3,7 @@ package com.example.twitter_clone.controller;
 
 import com.example.twitter_clone.dto.LikePostDTO;
 import com.example.twitter_clone.dto.PostDTO;
+import com.example.twitter_clone.dto.PostResponseDTO;
 import com.example.twitter_clone.model.Post;
 import com.example.twitter_clone.model.User;
 import com.example.twitter_clone.service.PostService;
@@ -26,10 +27,11 @@ public class PostController {
     private UserService userService;
 
 
-
-    @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPost());
+  //<List<PostResponseDTO>>
+    @GetMapping("/allPosts")
+    public ResponseEntity<?>  getAllPosts() {
+        System.out.println(postService.getAllPosts());
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
     @GetMapping("{postId}")
@@ -49,9 +51,8 @@ public class PostController {
 
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(
-                                           @RequestBody PostDTO postDTO) {
-
+    public ResponseEntity<Post> createPost(@RequestBody PostDTO postDTO) {
+        System.out.println(postDTO);
         Post post = postService.createPost(
               postDTO
         );
@@ -62,7 +63,7 @@ public class PostController {
     @PostMapping("/{postId}/like")
     public ResponseEntity<?> likePost(@PathVariable Long postId,
                                       @RequestBody LikePostDTO likeDTO) {
-        String message = postService.toggleLike(postId, likeDTO.getUserId());
+        String message = postService.toggleLike(postId, likeDTO.getUserClerkId());
         return ResponseEntity.ok(Map.of("message", message));
     }
 

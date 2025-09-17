@@ -25,6 +25,13 @@ public class UserController {
         User user = userService.getByUsername(String.valueOf(username));
         return  ResponseEntity.ok(username);
     }
+    @GetMapping("/me/{clerkId}")
+    public ResponseEntity<?> getCurrentUser(@PathVariable String clerkId){
+
+        User user = userService.getCurrentUser(clerkId);
+        return ResponseEntity.ok(user);
+
+    }
 
 
     @PutMapping("/profile/{clerkId}")

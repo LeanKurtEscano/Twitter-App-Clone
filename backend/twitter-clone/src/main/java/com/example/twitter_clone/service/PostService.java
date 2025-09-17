@@ -2,18 +2,27 @@ package com.example.twitter_clone.service;
 
 
 import com.example.twitter_clone.dto.PostDTO;
+import com.example.twitter_clone.dto.PostResponseDTO;
 import com.example.twitter_clone.exception.NotFoundException;
+import com.example.twitter_clone.model.Comment;
 import com.example.twitter_clone.model.Notification;
 import com.example.twitter_clone.model.Post;
 import com.example.twitter_clone.model.User;
+import com.example.twitter_clone.repo.CommentRepository;
 import com.example.twitter_clone.repo.NotificationRepository;
 import com.example.twitter_clone.repo.PostRepository;
 import com.example.twitter_clone.repo.UserRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -25,16 +34,40 @@ public class PostService {
     private UserRepository userRepo;
 
 
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     private NotificationRepository notificationRepo;
 
 
 
-    public List<Post> getAllPost() {
-        return postRepo.findAllByOrderByCreatedAtDesc();
 
+/*
+  public List<Post> getAllPost() {
+        return postRepo.findAll();
     }
+
+    public List<PostResponseDTO> getAllPost() {
+        List<Post> post = postRepo.findAll();
+        return post.stream().map(PostResponseDTO :: fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
+*/
+public List<PostResponseDTO> getAllPosts() {
+    List<Post> posts = postRepo.findAllOrderByCreatedAtDesc();
+
+    return posts.stream()
+            .map(post -> {
+                List<Comment> postComments = commentService.getAllComments(post.getId());
+                return PostResponseDTO.fromEntity(post, postComments);
+            })
+            .collect(Collectors.toList());
+}
+
+
 
 
     public Post getPostById(Long id) {
@@ -46,44 +79,27 @@ public class PostService {
     public List<Post> getPostsByUser(User user) {
         return postRepo.findByUserOrderByCreatedAtDesc(user);
     }
-
-
-    public Post createPost(PostDTO postDTO) {
-        // Find the user by id or username inside the DTO (you need to include it there)
-        User user = userRepo.findById(postDTO.getUserId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        Post post = Post.builder()
-                .user(user)
-                .content(postDTO.getContent())
-                .image(postDTO.getImage() != null ? postDTO.getImage() : "")
-                .build();
-
-        return postRepo.save(post);
-    }
-
-
-    public String toggleLike(Long postId, Long userId) {
+    public String toggleLike(Long postId, String userClerkId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post not found"));
 
-        User user = userRepo.findById(userId)
+        User user = userRepo.findByClerkId(userClerkId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        boolean isLiked = post.getLikes().contains(user);
+        // Defensive: ensure post.getLikes() is a Set
+        Set<User> likes = post.getLikes();
 
-        if (isLiked) {
+        if (likes.contains(user)) {
             // unlike
-            post.getLikes().remove(user);
+            likes.remove(user);
             postRepo.save(post);
             return "Post unliked successfully";
         } else {
             // like
-            post.getLikes().add(user);
+            likes.add(user);
             postRepo.save(post);
 
-            // create notification if not liking own post
-            if (!post.getUser().getId().equals(userId)) {
+            if (!post.getUser().getClerkId().equals(userClerkId)) {
                 Notification notification = Notification.builder()
                         .from(user)
                         .to(post.getUser())
@@ -96,6 +112,24 @@ public class PostService {
             return "Post liked successfully";
         }
     }
+
+
+    public Post createPost(PostDTO postDTO) {
+        // Find the user by id or username inside the DTO (you need to include it there)
+        User user = userRepo.findByClerkId(postDTO.getClerkUserId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Post post = Post.builder()
+                .user(user)
+                .content(postDTO.getContent())
+                .image(postDTO.getImage() != null ? postDTO.getImage() : "")
+                .build();
+
+        return postRepo.save(post);
+    }
+
+
+
 
     public void deletePost(Long postId) {
         Post post = postRepo.findById(postId)

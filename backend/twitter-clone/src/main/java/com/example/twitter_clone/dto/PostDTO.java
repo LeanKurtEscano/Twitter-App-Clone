@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PostDTO {
-    private Long userId;
+    private String clerkUserId;
     private String content;
     private String image; // optional URL string
 }

@@ -23,12 +23,13 @@ public class CommentController {
     @PostMapping("/comment")
     public ResponseEntity<?> createComment(@RequestBody CommentDTO dto){
 
+        commentService.createComment(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Comment Created");
 
     }
 
-    @GetMapping("/post/{postId")
+    @GetMapping("/post/{postId}")
     public ResponseEntity<?> getPostComments(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getAllComments(postId));
     }

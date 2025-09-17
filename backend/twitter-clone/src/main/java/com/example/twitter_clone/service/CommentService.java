@@ -38,8 +38,8 @@ public class CommentService {
 
 
 
-    public Comment createComment(CommentDTO dto) {
-        User user = userRepo.findById(dto.getUserId())
+    public void createComment(CommentDTO dto) {
+        User user = userRepo.findByClerkId(dto.getClerkUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         Post post = postRepo.findById(dto.getPostId())
@@ -53,7 +53,7 @@ public class CommentService {
 
         commentRepo.save(comment);
 
-        // Create notification if not commenting on own post
+
         if (!post.getUser().getId().equals(user.getId())) {
             Notification notification = Notification.builder()
                     .from(user)
@@ -65,7 +65,7 @@ public class CommentService {
             notificationRepo.save(notification);
         }
 
-        return comment;
+
     }
 
     public List<Comment> getAllComments(Long postId) {
