@@ -1,6 +1,7 @@
 package com.example.twitter_clone.controller;
 
 
+import com.example.twitter_clone.dto.NotificationDTO;
 import com.example.twitter_clone.model.Notification;
 import com.example.twitter_clone.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,11 @@ public class NotificationController {
     private NotificationService notificationService;
 
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long userId) {
-        List<Notification> notifications = notificationService.getNotifications(userId);
+    @GetMapping("/user/{clerkUserId}")
+    public ResponseEntity<?> getNotifications(@PathVariable String clerkUserId) {
+
+        List<NotificationDTO> notifications = notificationService.getNotifications(clerkUserId);
+
         return ResponseEntity.ok(notifications);
     }
 

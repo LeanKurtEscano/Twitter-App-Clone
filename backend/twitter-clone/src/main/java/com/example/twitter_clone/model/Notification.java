@@ -3,8 +3,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -22,16 +20,14 @@ public class Notification {
     // User who triggered the notification
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "from_user_id", nullable = false)
-    @JsonIgnoreProperties({"followers", "following", "posts", "comments"}) // prevent recursion
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "hibernateLazyInitializer", "handler"})
     private User from;
 
     // User who receives the notification
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id", nullable = false)
-    @JsonIgnoreProperties({"followers", "following", "posts", "comments"})
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "hibernateLazyInitializer", "handler"})
     private User to;
-
-    // Type of notification
 
     @Column(nullable = false)
     private String type;
@@ -39,13 +35,13 @@ public class Notification {
     // Related post (optional)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    @JsonIgnoreProperties({"comments", "likes", "user"}) // cut deep recursion
+    @JsonIgnoreProperties({"comments", "likes", "user", "hibernateLazyInitializer", "handler"})
     private Post post;
 
     // Related comment (optional)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
-    @JsonIgnoreProperties({"post", "likes", "user"})
+    @JsonIgnoreProperties({"post", "likes", "user", "hibernateLazyInitializer", "handler"})
     private Comment comment;
 
     @Column(updatable = false)
@@ -60,4 +56,3 @@ public class Notification {
         this.updatedAt = LocalDateTime.now();
     }
 }
-
