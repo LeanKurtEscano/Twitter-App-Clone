@@ -5,9 +5,9 @@ import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import PostCard from "./PostCard";
 import CommentsModal from "./CommentsModal";
-const PostsList = () => {
+const PostsList = ({username} : {username: string | null}) => {
   const { currentUser } = useCurrentUser();
-  const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
+  const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   
 
