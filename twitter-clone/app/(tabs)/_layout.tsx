@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Redirect, Tabs } from 'expo-router'
 import { useAuth } from '@clerk/clerk-expo'
 import Feather from '@expo/vector-icons/Feather'
@@ -7,7 +7,19 @@ const TabsLayout = () => {
 
   const { getToken } = useAuth();
 
-  console.log(getToken());
+   useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await getToken();
+        console.log('Token:', token);
+      } catch (err) {
+        console.error('Error getting token:', err);
+      }
+    };
+
+    fetchToken();
+  }, []);
+
 
     const {isSignedIn} = useAuth()
 

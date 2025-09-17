@@ -4,12 +4,14 @@ import { Post } from "@/types";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import PostCard from "./PostCard";
-
+import CommentsModal from "./CommentsModal";
 const PostsList = () => {
   const { currentUser } = useCurrentUser();
   const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  
 
+  console.log("PostsList Rendered with posts:", posts);
   const selectedPost = selectedPostId ? posts.find((p: Post) => p.id === selectedPostId) : null;
 
   if (isLoading) {
@@ -55,6 +57,7 @@ const PostsList = () => {
       ))}
 
       
+      <CommentsModal selectedPost={selectedPost} onClose={() => setSelectedPostId(null)} />
     </>
   );
 };
