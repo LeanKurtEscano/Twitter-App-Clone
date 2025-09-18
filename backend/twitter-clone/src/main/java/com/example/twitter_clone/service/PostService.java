@@ -1,6 +1,7 @@
 package com.example.twitter_clone.service;
 
 
+import ch.qos.logback.core.BasicStatusManager;
 import com.example.twitter_clone.dto.PostDTO;
 import com.example.twitter_clone.dto.PostResponseDTO;
 import com.example.twitter_clone.exception.NotFoundException;
@@ -33,6 +34,9 @@ public class PostService {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private CommentRepository commentRepo;
+
 
     @Autowired
     private CommentService commentService;
@@ -42,20 +46,19 @@ public class PostService {
 
 
 
-
-/*
-  public List<Post> getAllPost() {
-        return postRepo.findAll();
-    }
-
-    public List<PostResponseDTO> getAllPost() {
-        List<Post> post = postRepo.findAll();
-        return post.stream().map(PostResponseDTO :: fromEntity)
-                .collect(Collectors.toList());
-    }
-
-
-*/
+    /*
+      public List<Post> getAllPost() {
+            return postRepo.findAll();
+        }
+    
+        public List<PostResponseDTO> getAllPost() {
+            List<Post> post = postRepo.findAll();
+            return post.stream().map(PostResponseDTO :: fromEntity)
+                    .collect(Collectors.toList());
+        }
+    
+    
+    */
 public List<PostResponseDTO> getAllPosts() {
     List<Post> posts = postRepo.findAllOrderByCreatedAtDesc();
 
@@ -76,9 +79,18 @@ public List<PostResponseDTO> getAllPosts() {
     }
 
 
-    public List<Post> getPostsByUser(User user) {
-        return postRepo.findByUserOrderByCreatedAtDesc(user);
+    public List<PostResponseDTO> getPostsByUser(User user) {
+        List<Post> posts = postRepo.findByUserOrderByCreatedAtDesc(user);
+
+        return posts.stream()
+                .map(post ->  {
+                    List<Comment> comments =  commentService.getAllComments(post.getId());
+                    return PostResponseDTO.fromEntity(post, comments);
+
+                }).collect(Collectors.toList());
     }
+
+
     public String toggleLike(Long postId, String userClerkId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post not found"));
@@ -130,11 +142,15 @@ public List<PostResponseDTO> getAllPosts() {
 
 
 
-
+    @Transactional
     public void deletePost(Long postId) {
-        Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("Post not found"));
-        postRepo.delete(post);
+        commentRepo.deleteByPostId(postId);
+
+        // Step 2: delete likes (join table)
+        postRepo.deleteLikesByPostId(postId);
+
+        // Step 3: delete post (parent table)
+        postRepo.deletePostById(postId);
     }
 }
 

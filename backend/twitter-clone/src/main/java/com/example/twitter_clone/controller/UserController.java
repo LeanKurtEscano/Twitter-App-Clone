@@ -1,5 +1,6 @@
 package com.example.twitter_clone.controller;
 
+import com.example.twitter_clone.dto.UpdateProfileDto;
 import com.example.twitter_clone.dto.UserDTO;
 import com.example.twitter_clone.model.User;
 import com.example.twitter_clone.service.UserService;
@@ -35,10 +36,12 @@ public class UserController {
 
 
     @PutMapping("/profile/{clerkId}")
-    public ResponseEntity<?> updateProfile(@RequestParam String clerkId) {
+    public ResponseEntity<?> updateProfile(@PathVariable String clerkId, @RequestBody UpdateProfileDto dto) {
      // to be built once frontend is finalized
 
-        return ResponseEntity.ok("dsdd");
+        userService.updateUser(clerkId,dto);
+
+        return ResponseEntity.ok("User Profile Updated");
     }
 
 

@@ -42,10 +42,11 @@ public class PostController {
 
 
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<?> getUserPosts(@PathVariable String username) {
-        User user = userService.getByUsername(username);
-        List<Post> posts = postService.getPostsByUser(user);
+    @GetMapping("/user/{clerkId}")
+    public ResponseEntity<?> getUserPosts(@PathVariable String clerkId) {
+        System.out.println(clerkId);
+        User user = userService.getCurrentUser(clerkId);
+        List<PostResponseDTO> posts = postService.getPostsByUser(user);
         return ResponseEntity.ok(posts);
     }
 

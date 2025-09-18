@@ -1,6 +1,7 @@
 package com.example.twitter_clone.service;
 
 import com.example.twitter_clone.dto.SyncDTO;
+import com.example.twitter_clone.dto.UpdateProfileDto;
 import com.example.twitter_clone.dto.UserDTO;
 import com.example.twitter_clone.exception.NotFoundException;
 import com.example.twitter_clone.model.User;
@@ -84,6 +85,21 @@ public class UserService {
     public User getCurrentUser(String clerkId) {
         return  userRepo.findByClerkId(clerkId).orElseThrow(
                 () -> new NotFoundException("User not found"));
+
+    }
+
+
+    public void updateUser(String clerkId, UpdateProfileDto dto) {
+
+        User user = userRepo.findByClerkId(clerkId).orElseThrow(() ->
+                new NotFoundException("User not found" + clerkId));
+
+             user.setFirstName(dto.getFirstName());
+             user.setLastName(dto.getLastName());
+             user.setBio(dto.getBio());
+             user.setLocation(dto.getLocation());
+
+             userRepo.save(user);
 
     }
 

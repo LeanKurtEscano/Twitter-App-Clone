@@ -32,16 +32,26 @@ public class Notification {
     @Column(nullable = false)
     private String type;
 
-    // Related post (optional)
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    @JsonIgnoreProperties({"comments", "likes", "user", "hibernateLazyInitializer", "handler"})
+    @JoinColumn(
+            name = "post_id",
+            foreignKey = @ForeignKey(
+                    name = "fk_notifications_posts",
+                    foreignKeyDefinition = "FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE SET NULL"
+            )
+    )
     private Post post;
 
     // Related comment (optional)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    @JsonIgnoreProperties({"post", "likes", "user", "hibernateLazyInitializer", "handler"})
+    @JoinColumn(
+            name = "comment_id",
+            foreignKey = @ForeignKey(
+                    name = "fk_notifications_comments",
+                    foreignKeyDefinition = "FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE SET NULL"
+            )
+    )
     private Comment comment;
 
     @Column(updatable = false)

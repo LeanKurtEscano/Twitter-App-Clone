@@ -7,7 +7,7 @@ export const usePosts = (username?: string) => {
   const user = useUser();
   const queryClient = useQueryClient();
 
-  // Query for all posts
+
   const { data: postsData, isLoading: allLoading, error: allError, refetch: allRefetch } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
@@ -28,7 +28,7 @@ export const usePosts = (username?: string) => {
     enabled: !!username, 
   });
 
-  // Like post mutation
+ 
   const likePostMutation = useMutation({
     mutationFn: async (postId: string) => {
       const response = await postApi.post(`/${postId}/like`, {
@@ -42,7 +42,6 @@ export const usePosts = (username?: string) => {
     },
   });
 
-  // Delete post mutation
   const deletePostMutation = useMutation({
     mutationFn: async (postId: string) => {
       const response = await postApi.delete(`/${postId}`);
