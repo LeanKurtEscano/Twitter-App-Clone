@@ -10,9 +10,7 @@ export const useProfile = () => {
   const profileApi = useApiClient("http://192.168.1.16:8080/api/user");
   const userApi = useApiClient("http://192.168.1.16:8080/api/user");
   const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
-  const selectedUsername = useUserProfileStore(
-    (state) => state.selectedUsername
-  );
+
   const selectedUserClerkId = useUserProfileStore(
     (state) => state.selectedUserClerkId
   );
@@ -42,14 +40,11 @@ export const useProfile = () => {
   });
 
 
-
-
-
    const { data: userPostsData, isLoading: userPostsLoading, error: userPostsError, refetch: userPostRefetch } = useQuery({
     queryKey: ["userProfileposts"],
     queryFn: async () => {
     
-      const response = await postApi.get(`/user/${selectedUsername}`);
+      const response = await postApi.get(`/user/${selectedUserClerkId}`);
       return response.data;
     }
   });

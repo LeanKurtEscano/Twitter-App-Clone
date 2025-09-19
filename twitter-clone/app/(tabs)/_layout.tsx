@@ -5,21 +5,6 @@ import { useAuth } from '@clerk/clerk-expo'
 import Feather from '@expo/vector-icons/Feather'
 const TabsLayout = () => {
 
-  const { getToken } = useAuth();
-
-   useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const token = await getToken();
-        console.log('Token:', token);
-      } catch (err) {
-        console.error('Error getting token:', err);
-      }
-    };
-
-    fetchToken();
-  }, []);
-
 
     const {isSignedIn} = useAuth()
 
@@ -34,6 +19,8 @@ const TabsLayout = () => {
         <Tabs.Screen name="messages" options={{ tabBarIcon: ({color,size}) => <Feather name='mail' size={size} color={color}/> }} />
         <Tabs.Screen name="notification" options={{ tabBarIcon: ({color,size}) => <Feather name='bell' size={size} color={color}/> }} />
         <Tabs.Screen name="profile" options={{ tabBarIcon: ({color,size}) => <Feather name='user' size={size} color={color}/> }} />
+        <Tabs.Screen name="user/[id]"options={{  href: null, }}/>
+
     </Tabs>
   )
 }

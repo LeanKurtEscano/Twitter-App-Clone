@@ -11,7 +11,8 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
-
+ 
+import { formatDate } from "@/lib/util";
 interface CommentsModalProps {
   selectedPost: Post;
   onClose: () => void;
@@ -81,12 +82,14 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                   className="w-10 h-10 rounded-full mr-3"
                 />
 
+
                 <View className="flex-1">
-                  <View className="flex-row items-center mb-1">
+                  <View className="flex-row items-center relative mb-1">
                     <Text className="font-bold text-gray-900 mr-1">
                       {comment.user.firstName} {comment.user.lastName}
                     </Text>
                     <Text className="text-gray-500 text-sm ml-1">@{comment.user.username}</Text>
+                    <Text className="text-gray-500 text-sm absolute right-0 ml-1">{formatDate(comment.createdAt)}</Text>
                   </View>
 
                   <Text className="text-gray-900 text-base leading-5 mb-2">{comment.content}</Text>

@@ -20,7 +20,7 @@ export const useSocialAuth = () => {
             console.log("🔄 Calling startSSOFlow...");
             const { createdSessionId, setActive } = await startSSOFlow({ strategy });
 
-            console.log("📝 SSO Flow result:", { createdSessionId: !!createdSessionId, setActive: !!setActive });
+          
 
             if (createdSessionId && setActive) {
                 console.log("✅ Setting active session...");

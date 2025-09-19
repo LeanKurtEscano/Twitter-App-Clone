@@ -1,4 +1,5 @@
 import { useApiClient } from "@/config/axiosInstance";
+import { LikeUser } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -22,7 +23,7 @@ export const usePosts = (username?: string) => {
     queryKey: ["posts", username],
     queryFn: async () => {
       if (!username) return [];
-      const response = await postApi.get(`/user/${user.user?.id}`);
+      const response = await postApi.get(`/user/${username}`);
       return response.data;
     },
     enabled: !!username, 
@@ -53,8 +54,8 @@ export const usePosts = (username?: string) => {
     },
   });
 
-  const checkIsLiked = (postLikes: string[], currentUser: any) => {
-    return currentUser && postLikes.includes(currentUser.id);
+  const checkIsLiked = (postLikes: LikeUser[], currentUser: any) => {
+    return postLikes.some((user) => user.id === currentUser.id);
   };
 
   const posts = username ? userPostsData || [] : postsData || [];

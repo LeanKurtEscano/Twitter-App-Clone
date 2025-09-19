@@ -2,6 +2,8 @@ import { Post, User } from "@/types";
 import { formatDate, formatNumber } from "@/lib/util";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { View, Text, Alert, Image, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { useUserProfileStore } from "@/store";
 
 interface PostCardProps {
   post: Post;
@@ -14,6 +16,20 @@ interface PostCardProps {
 
 const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: PostCardProps) => {
   const isOwnPost = post.user.id === currentUser.id;
+  const setSelectedUserClerkId = useUserProfileStore((state) => state.setSelectedUserClerkId);
+  const setSelectedUsername = useUserProfileStore((state) => state.setSelectedUsername);
+  const router = useRouter();
+
+
+  const goToUserProfile = (clerkId: string) => {
+    setSelectedUserClerkId(clerkId);
+    setSelectedUsername(post.user.username);
+    router.push({
+      pathname: "/(tabs)/user/[id]",
+      params: { id: clerkId },
+    });
+  }
+
 
   const handleDelete = () => {
     Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
@@ -29,10 +45,12 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
   return (
     <View className="border-b border-gray-100 bg-white">
       <View className="flex-row p-4">
-        <Image
-          source={{ uri: post.user.profilePicture || "" }}
-          className="w-12 h-12 rounded-full mr-3"
-        />
+          <TouchableOpacity onPress={() => isOwnPost ? router.push("/(tabs)/profile"): goToUserProfile(post.user.clerkId)}>
+    <Image
+      source={{ uri: post.user.profilePicture || "" }}
+      className="w-12 h-12 rounded-full mr-3"
+    />
+  </TouchableOpacity>
 
         <View className="flex-1">
           <View className="flex-row items-center justify-between mb-1">
@@ -76,9 +94,9 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
               <Text className="text-gray-500 text-sm ml-2">0</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center" onPress={() => onLike(post.id)}>
+            <TouchableOpacity activeOpacity={1} className="flex-row items-center" onPress={() => onLike(post.id)}>
               {isLiked ? (
-                <AntDesign name="heart" size={18} color="#E0245E" />
+                <AntDesign name="heart" size={18} color={isLiked ? "red" : "#657786"} />
               ) : (
                 <Feather name="heart" size={18} color="#657786" />
               )}

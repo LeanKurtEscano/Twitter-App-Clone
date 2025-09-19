@@ -9,9 +9,10 @@ const PostsList = ({username} : {username: string | null}) => {
   const { currentUser } = useCurrentUser();
   const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  
+    
 
-  console.log("PostsList Rendered with posts:", posts);
+  console.log(posts);
+
   const selectedPost = selectedPostId ? posts.find((p: Post) => p.id === selectedPostId) : null;
 
   if (isLoading) {

@@ -1,5 +1,6 @@
 export interface User {
   id: string;
+  clerkId: string;
   username: string;
   firstName: string;
   lastName: string;
@@ -43,4 +44,15 @@ export interface Notification {
     content: string;
   };
   createdAt: string;
+}
+
+
+export interface LikeUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePicture: string;
+  createdAt: string; // or Date if you parse it
+  updatedAt: string; // or Date if you parse it
 }
