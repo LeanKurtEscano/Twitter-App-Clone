@@ -103,7 +103,7 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                     <Text className="text-gray-500 text-sm ml-1">@{comment.user.username}</Text>
 
                     {comment.user.id === currentUser.id && (
-                      <TouchableOpacity className="absolute right-4" onPress={() => handleDelete(comment.id)}>
+                      <TouchableOpacity className="absolute right-5" onPress={() => handleDelete(comment.id)}>
                         <Feather name="trash" size={16} color="#657786" />
                       </TouchableOpacity>
                     )}

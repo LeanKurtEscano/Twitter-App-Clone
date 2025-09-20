@@ -14,24 +14,25 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const UserProfileScreen = () => {
- 
+
   const insets = useSafeAreaInsets();
 
-
+  const { currentUser } = useCurrentUser();
 
   const {
     profileUser,
     isLoading: isProfileLoading,
-    error,  
+    error,
     userPostsData,
     userPostsLoading,
     userPostsError,
     userPostRefetch,
-   
+    followUser,
     refetchProfileUser
   } = useProfile();
 
@@ -42,6 +43,14 @@ const UserProfileScreen = () => {
       </View>
     );
   }
+
+  console.log("Profile User:", profileUser);
+
+
+  const handleFollow = (userId: string) => {
+    followUser(userId);
+    Alert.alert("Followed", `You are now following ${profileUser?.username}`);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
@@ -87,7 +96,18 @@ const UserProfileScreen = () => {
               source={{ uri: profileUser?.profilePicture }}
               className="w-32 h-32 rounded-full border-4 border-white"
             />
-          
+
+            <TouchableOpacity
+              className="bg-[#1DA1F2] rounded-full px-5 py-2"
+              activeOpacity={1}
+              onPress={() => {
+                handleFollow(profileUser?.id);
+              }}
+            >
+              <Text className="text-white font-bold text-sm">{profileUser?.followers?.some(follower => follower.followerId === currentUser?.id) ? "Unfollow" : "Follow"}</Text>
+            </TouchableOpacity>
+
+
           </View>
 
           <View className="mb-4">
@@ -97,7 +117,22 @@ const UserProfileScreen = () => {
               </Text>
               <Feather name="check-circle" size={20} color="#1DA1F2" />
             </View>
-            <Text className="text-gray-500 mb-2">@{profileUser?.username}</Text>
+            <View className="flex-row items-center mb-1">
+              <Text className="text-gray-500 mr-2 ">@{profileUser?.username}</Text>
+
+              {currentUser?.followers?.some(follower => follower.followerId === profileUser?.id) && (
+                <Text className="text-md  bg-slate-100 p-1 font-medium text-[#6e767d]">
+                  Follows you
+                </Text>
+
+              )}
+
+
+            </View>
+
+
+
+
             <Text className="text-gray-900 mb-3">{profileUser?.bio}</Text>
 
             <View className="flex-row items-center mb-2">
@@ -132,7 +167,7 @@ const UserProfileScreen = () => {
         <PostsList username={profileUser?.username} />
       </ScrollView>
 
-      
+
     </SafeAreaView>
   );
 };

@@ -41,10 +41,6 @@ export const useProfile = () => {
     },
   });
 
-
-
-
-
    const { data: userPostsData, isLoading: userPostsLoading, error: userPostsError, refetch: userPostRefetch } = useQuery({
     queryKey: ["userProfileposts"],
     queryFn: async () => {
@@ -62,6 +58,18 @@ export const useProfile = () => {
             return response.data;
         }
     });
+
+
+    
+
+
+    const followMutation = useMutation({
+      mutationFn: (userId: string) => userApi.post(`/${currentUser?.id}/follow/${userId}`),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+        queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      },
+    })
 
   const openEditModal = () => {
     if (currentUser) {
@@ -96,5 +104,6 @@ export const useProfile = () => {
     updateFormField,
     isUpdating: updateProfileMutation.isPending,
     refetch: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+    followUser : (userId: string) => followMutation.mutate(userId),
   };
 };
