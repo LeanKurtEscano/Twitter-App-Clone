@@ -37,6 +37,7 @@ public class PostResponseDTO {
     @Data
     public static class UserPostDTO {
         private Long id;
+        private  String clerkId;
         private String firstName;
         private String lastName;
         private String username;
@@ -88,6 +89,7 @@ public class PostResponseDTO {
     private static UserPostDTO toUserPostDTO(User user) {
         UserPostDTO dto = new UserPostDTO();
         dto.setId(user.getId());
+        dto.setClerkId(user.getClerkId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setUsername(user.getUsername());

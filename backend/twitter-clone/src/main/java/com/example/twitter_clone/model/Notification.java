@@ -54,6 +54,16 @@ public class Notification {
     )
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "notification_id",
+            foreignKey = @ForeignKey(
+                    name = "fk_notifications_notifications",
+                    foreignKeyDefinition = "FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE SET NULL"
+            )
+    )
+    private Notification notification;
+
     @Column(updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

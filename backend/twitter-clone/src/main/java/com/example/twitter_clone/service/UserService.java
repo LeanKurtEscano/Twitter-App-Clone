@@ -4,12 +4,18 @@ import com.example.twitter_clone.dto.SyncDTO;
 import com.example.twitter_clone.dto.UpdateProfileDto;
 import com.example.twitter_clone.dto.UserDTO;
 import com.example.twitter_clone.exception.NotFoundException;
+import com.example.twitter_clone.model.Follow;
+import com.example.twitter_clone.model.Notification;
 import com.example.twitter_clone.model.User;
+import com.example.twitter_clone.repo.FollowRepository;
+import com.example.twitter_clone.repo.NotificationRepository;
 import com.example.twitter_clone.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +25,12 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private FollowRepository followRepo;
+
+    @Autowired
+    private NotificationRepository notificationRepo;
 
 
     public void registerUser(SyncDTO dto) {
@@ -45,45 +57,61 @@ public class UserService {
     }
 
 
-    public void followUser(Long userId, Long targetId) {
-        User user = userRepo.findById(userId).orElseThrow();
-        User target = userRepo.findById(targetId).orElseThrow();
+    @Transactional
+    public void followUser(Long followerId, Long followedId) {
+        User follower = userRepo.findById(followerId)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+        User followed = userRepo.findById(followedId)
+                .orElseThrow(() -> new RuntimeException("User to follow not found"));
 
-        user.getFollowing().add(target);
-        userRepo.save(user);
+        Optional<Follow> existingFollow = followRepo.findByFollowerAndFollowed(follower, followed);
+
+        if (existingFollow.isPresent()) {
+            // 🔹 Unfollow logic
+            Follow follow = existingFollow.get();
+            followRepo.delete(follow);
+
+            follower.getFollowing().remove(follow);
+            followed.getFollowers().remove(follow);
+
+            notificationRepo.deleteByFromAndToAndType(follower,followed , "follow");
+
+        } else {
+            // 🔹 Follow logic
+            Follow follow = new Follow();
+            follow.setFollower(follower);
+            follow.setFollowed(followed);
+
+
+
+            // maintain both sides
+            follower.getFollowing().add(follow);
+            followed.getFollowers().add(follow);
+
+            followRepo.save(follow);
+
+
+            Notification notification = Notification.builder()
+                    .from(follower)
+                    .to(followed)
+                    .type("follow")
+                    .build();
+
+            notificationRepo.save(notification);
+        }
     }
 
-    public void unfollowUser(Long userId, Long targetId) {
-        User user = userRepo.findById(userId).orElseThrow();
-        User target = userRepo.findById(targetId).orElseThrow();
 
-        user.getFollowing().remove(target);
-        userRepo.save(user);
-    }
-
-
-    public List<UserDTO> getFollowers(Long userId) {
-
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-
-        return user.getFollowing().stream()
-                .map(u -> new UserDTO(u.getId(), u.getUsername(), u.getProfilePicture()))
-                .collect(Collectors.toList());
-    }
-
-    public List<UserDTO> getFollowing(Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-
-        return user.getFollowing().stream()
-                .map(u -> new UserDTO(u.getId(), u.getUsername(), u.getProfilePicture()))
-                .collect(Collectors.toList());
-    }
 
 
     public User getCurrentUser(String clerkId) {
         return  userRepo.findByClerkId(clerkId).orElseThrow(
+                () -> new NotFoundException("User not found"));
+
+    }
+
+    public User getUserByUsername(String username) {
+        return  userRepo.findByUsername(username).orElseThrow(
                 () -> new NotFoundException("User not found"));
 
     }

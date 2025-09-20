@@ -47,18 +47,14 @@ public class UserController {
 
     @PostMapping("/{userId}/follow/{targetId}")
     public ResponseEntity<?> followUser(@PathVariable Long userId, @PathVariable Long targetId) {
+        System.out.println(userId);
+        System.out.println(targetId);
         userService.followUser(userId, targetId);
         return ResponseEntity.ok("User Followed");
     }
 
-    @PostMapping("/{userId}/unfollow/{targetId}")
-    public ResponseEntity<?> unfollowUser(@PathVariable Long userId, @PathVariable Long targetId) {
-        userService.unfollowUser(userId, targetId);
-        return ResponseEntity.ok("User unfollowed");
-    }
 
-
-    @GetMapping("/{userId}/followers")
+   /*  @GetMapping("/{userId}/followers")
     public ResponseEntity<List<UserDTO>> getFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowers(userId));
     }
@@ -66,7 +62,8 @@ public class UserController {
     @GetMapping("/{userId}/following")
     public ResponseEntity<List<UserDTO>> getFollowing(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowing(userId));
-    }
+    }*/
+
 
 
 }

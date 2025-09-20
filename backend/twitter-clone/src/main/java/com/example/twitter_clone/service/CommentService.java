@@ -14,6 +14,7 @@ import com.example.twitter_clone.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -75,11 +76,11 @@ public class CommentService {
         return commentRepo.findByPostOrderByCreatedAtDesc(post);
     }
 
+
+    @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepo.findById(commentId).orElseThrow(() -> new NotFoundException("comment not found"));
-
-        Post post = comment.getPost();
-        post.getComments().remove(comment);
+        commentRepo.delete(comment);
     }
 
 

@@ -2,7 +2,9 @@ package com.example.twitter_clone.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -51,26 +53,14 @@ public class User {
     private String location;
 
     // Followers (self-referencing many-to-many)
-    @ManyToMany
-    @JoinTable(
-            name = "user_followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
-    @Builder.Default
-    @JsonIgnoreProperties({"followers", "following"})
-    private Set<User> followers = new HashSet<>();
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Follow> following = new HashSet<>();
 
-    // Following (self-referencing many-to-many)
-    @ManyToMany
-    @JoinTable(
-            name = "user_following",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "following_id")
-    )
-    @Builder.Default
-    @JsonIgnoreProperties({"followers", "following"})
-    private Set<User> following = new HashSet<>();
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Follow> followers = new HashSet<>();
+
 
     @Column(updatable = false)
     @Builder.Default
