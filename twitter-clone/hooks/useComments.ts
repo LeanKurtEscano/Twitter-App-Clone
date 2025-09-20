@@ -35,10 +35,21 @@ export const useComments = () => {
     createCommentMutation.mutate({ postId, content: commentText.trim() });
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: async (commentId: string) => { 
+      const response = await commentsApi.delete(`/${commentId}`);   
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
   return {
     commentText,
     setCommentText,
     createComment,
     isCreatingComment: createCommentMutation.isPending,
+    deleteComment: (commentId: string) => deleteMutation.mutate(commentId),
   };
 };

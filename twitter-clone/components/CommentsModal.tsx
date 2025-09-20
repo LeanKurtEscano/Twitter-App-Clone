@@ -10,8 +10,9 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
- 
+import { Feather } from "@expo/vector-icons";
 import { formatDate } from "@/lib/util";
 interface CommentsModalProps {
   selectedPost: Post;
@@ -19,13 +20,24 @@ interface CommentsModalProps {
 }
 
 const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
-  const { commentText, setCommentText, createComment, isCreatingComment } = useComments();
+  const { commentText, setCommentText, createComment, isCreatingComment,deleteComment } = useComments();
   const { currentUser } = useCurrentUser();
 
   const handleClose = () => {
     onClose();
     setCommentText("");
   };
+
+    const handleDelete = (commentId: string) => {
+      Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteComment(commentId),
+        }
+      ]);
+    };
 
   return (
     <Modal visible={!!selectedPost} animationType="slide" presentationStyle="pageSheet">
@@ -89,6 +101,12 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                       {comment.user.firstName} {comment.user.lastName}
                     </Text>
                     <Text className="text-gray-500 text-sm ml-1">@{comment.user.username}</Text>
+
+                    {comment.user.id === currentUser.id && (
+                      <TouchableOpacity className="absolute right-4" onPress={() => handleDelete(comment.id)}>
+                        <Feather name="trash" size={16} color="#657786" />
+                      </TouchableOpacity>
+                    )}
                     <Text className="text-gray-500 text-sm absolute right-0 ml-1">{formatDate(comment.createdAt)}</Text>
                   </View>
 
@@ -119,9 +137,8 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                 />
 
                 <TouchableOpacity
-                  className={`px-4 py-2 rounded-lg self-start ${
-                    commentText.trim() ? "bg-blue-500" : "bg-gray-300"
-                  }`}
+                  className={`px-4 py-2 rounded-lg self-start ${commentText.trim() ? "bg-blue-500" : "bg-gray-300"
+                    }`}
                   onPress={() => createComment(selectedPost.id)}
                   disabled={isCreatingComment || !commentText.trim()}
                 >
@@ -129,9 +146,8 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                     <ActivityIndicator size={"small"} color={"white"} />
                   ) : (
                     <Text
-                      className={`font-semibold ${
-                        commentText.trim() ? "text-white" : "text-gray-500"
-                      }`}
+                      className={`font-semibold ${commentText.trim() ? "text-white" : "text-gray-500"
+                        }`}
                     >
                       Reply
                     </Text>

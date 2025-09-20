@@ -76,7 +76,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
           {post?.image && (
             <Image
               source={{ uri: post.image }}
-              className="w-full h-48 rounded-2xl mb-3"
+              className="w-full h-64 rounded-2xl mb-3"
               resizeMode="cover"
             />
           )}
