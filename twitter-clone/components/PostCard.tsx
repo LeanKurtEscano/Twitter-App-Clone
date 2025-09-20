@@ -45,8 +45,8 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment }: P
   return (
     <View className="border-b border-gray-100 bg-white">
       <View className="flex-row p-4">
-          <TouchableOpacity onPress={() => isOwnPost ? router.push("/(tabs)/profile"): goToUserProfile(post.user.clerkId)}>
-    <Image
+          <TouchableOpacity activeOpacity={1}onPress={() => isOwnPost ? router.push("/(tabs)/profile"): goToUserProfile(post.user.clerkId)}>
+    <Image 
       source={{ uri: post.user.profilePicture || "" }}
       className="w-12 h-12 rounded-full mr-3"
     />
