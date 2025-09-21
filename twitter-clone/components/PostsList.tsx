@@ -12,6 +12,8 @@ const PostsList = ({username} : {username: string | null}) => {
     
 
   console.log(posts);
+   const postMap: Map<string, Post> = new Map(posts.map((p: Post) => [p.id, p]));
+
 
   const selectedPost = selectedPostId ? posts.find((p: Post) => p.id === selectedPostId) : null;
 
@@ -53,7 +55,8 @@ const PostsList = ({username} : {username: string | null}) => {
           onDelete={deletePost}
           onComment={(post: Post) => setSelectedPostId(post.id)}
           currentUser={currentUser}
-          isLiked={checkIsLiked(post.likes, currentUser)}
+          isLiked={post.retweetOf ? checkIsLiked(post?.retweetOf.likes, currentUser) : checkIsLiked(post.likes, currentUser)}
+          postMap={postMap}
         />
       ))}
 

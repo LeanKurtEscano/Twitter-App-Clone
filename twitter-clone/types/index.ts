@@ -22,6 +22,7 @@ export interface Post {
   user: User;
   likes: string[];
   comments: Comment[];
+  retweetOf?: Post | null;
 }
 
 export interface Notification {
@@ -56,3 +57,11 @@ export interface LikeUser {
   createdAt: string; // or Date if you parse it
   updatedAt: string; // or Date if you parse it
 }
+
+
+export interface Followers  {
+  id: number;
+  followedAt: string;   // ISO timestamp
+  followedId: number;   // the user being followed
+  followerId: number;   // the user who follows 
+};

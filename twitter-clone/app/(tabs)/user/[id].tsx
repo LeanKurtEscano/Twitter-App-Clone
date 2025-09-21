@@ -18,6 +18,8 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+
+import { Followers } from "@/types";
 const UserProfileScreen = () => {
 
   const insets = useSafeAreaInsets();
@@ -44,8 +46,7 @@ const UserProfileScreen = () => {
     );
   }
 
-  console.log("Profile User:", profileUser);
-
+  
 
   const handleFollow = (userId: string) => {
     followUser(userId);
@@ -104,7 +105,7 @@ const UserProfileScreen = () => {
                 handleFollow(profileUser?.id);
               }}
             >
-              <Text className="text-white font-bold text-sm">{profileUser?.followers?.some(follower => follower.followerId === currentUser?.id) ? "Unfollow" : "Follow"}</Text>
+              <Text className="text-white font-bold text-sm">{profileUser?.followers?.some((follower: Followers) => follower.followerId === currentUser?.id) ? "Unfollow" : "Follow"}</Text>
             </TouchableOpacity>
 
 
@@ -120,7 +121,7 @@ const UserProfileScreen = () => {
             <View className="flex-row items-center mb-1">
               <Text className="text-gray-500 mr-2 ">@{profileUser?.username}</Text>
 
-              {currentUser?.followers?.some(follower => follower.followerId === profileUser?.id) && (
+              {currentUser?.followers?.some((follower: Followers) => follower.followerId === profileUser?.id) && (
                 <Text className="text-md  bg-slate-100 p-1 font-medium text-[#6e767d]">
                   Follows you
                 </Text>

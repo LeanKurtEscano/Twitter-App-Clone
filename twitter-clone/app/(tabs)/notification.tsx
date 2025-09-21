@@ -17,7 +17,6 @@ const NotificationsScreen = () => {
   const { notifications, isLoading, error, refetch, isRefetching, deleteNotification } =
     useNotifications();
 
-    console.log("Notifications:", notifications);
 
   const insets = useSafeAreaInsets();
 
