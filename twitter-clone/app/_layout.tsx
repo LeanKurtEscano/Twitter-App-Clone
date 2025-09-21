@@ -16,7 +16,7 @@ const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 export default function RootLayout() {
     const [queryClient] = useState(() => new QueryClient());
     return  (
-        <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <ClerkProvider  telemetry={false} publishableKey={publishableKey} tokenCache={tokenCache}>
             <QueryClientProvider client={queryClient}>
 
         <Stack screenOptions={{ headerShown: false }}>

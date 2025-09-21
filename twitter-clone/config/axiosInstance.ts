@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { useAuth } from "@clerk/clerk-expo";
-
+import { useMemo } from "react";
 export const createApi = (
   baseURL: string,
   getToken?: () => Promise<string | null> 
@@ -36,8 +36,24 @@ export const createApi = (
   return instance;
 };
 
-// Custom hook
+
+
+
 export const useApiClient = (url: string): AxiosInstance => {
-  const { getToken } = useAuth();
-  return createApi(url, getToken);
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  
+  // Memoize the API client to prevent unnecessary re-creation
+  const apiClient = useMemo(() => {
+    // If not loaded yet, create basic client without auth
+    if (!isLoaded) {
+      return createApi(url); // No token getter
+    }
+    
+    // Only pass getToken if user is signed in
+    const tokenGetter = isSignedIn ? getToken : undefined;
+    
+    return createApi(url, tokenGetter);
+  }, [url, getToken, isLoaded, isSignedIn]);
+
+  return apiClient; 
 };

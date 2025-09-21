@@ -28,7 +28,11 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
   const [isRetweetModalVisible, setIsRetweetModalVisible] = useState(false);
   
-   const original = post.retweetOf ? postMap.get(post.retweetOf.id) : post
+  const original = post.retweetOf ? postMap.get(post.retweetOf.id) : post;
+
+  const hasRetweeted = Array.from(postMap.values()).some(
+    p => p.retweetOf?.id === (post.retweetOf ? post.retweetOf.id : post.id) && p.user.id === currentUser.id
+  )
   const handleQuote = () => {
 
 
@@ -67,7 +71,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
             <Text className="text-gray-400 font-bold  text-md ml-1">
 
-              {post.retweetOf?.user.firstName} {post.retweetOf?.user.lastName} reposted
+              {post.user.username} reposted
 
             </Text>
 
@@ -90,7 +94,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
                     {post.retweetOf?.user.firstName} {post.retweetOf?.user.lastName}
                   </Text>
                   <Text className="text-gray-500 text-lg ml-1">
-                    @{post.retweetOf?.user.username} · {formatDate(post.retweetOf?.createdAt)}
+                    @{post.retweetOf?.user.username}  {formatDate(post.retweetOf?.createdAt)}
                   </Text>
                 </View>
                 {isOwnPost && (
@@ -117,12 +121,12 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
                   <Feather name="message-circle" size={18} color="#657786" />
                   <Text className="text-gray-500 text-sm ml-2">
                    
-                    {formatNumber(original?.comments?.length || 0)}
+                    {formatNumber(original?.comments?.length || 0 )}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => setIsRetweetModalVisible(true)} className="flex-row items-center">
-                  <Feather name="repeat" size={18} color="#657786" />
+                  <Feather name="repeat" size={18} color={hasRetweeted ? "green" : "#657786"} />
                   <Text className="text-gray-500 text-sm ml-2">0 </Text>
                 </TouchableOpacity>
 
@@ -194,7 +198,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => setIsRetweetModalVisible(true)} className="flex-row items-center">
-                <Feather name="repeat" size={18} color="#657786" />
+                <Feather name="repeat" size={18} color={hasRetweeted ? "green" : "#657786"} />
                 <Text className="text-gray-500 text-sm ml-2">0</Text>
               </TouchableOpacity>
 
@@ -222,7 +226,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
       <RetweetModal
         isVisible={isRetweetModalVisible}
         onClose={() => setIsRetweetModalVisible(false)}
-        onRepost={() => handleRetweetPost(post.id)}
+        onRepost={() => post?.retweetOf ? handleRetweetPost(post.retweetOf.id) : handleRetweetPost(post.id)}
         onQuote={handleQuote}
       />
     </View>
