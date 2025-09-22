@@ -6,10 +6,14 @@ import { useApiClient } from "@/config/axiosInstance";
 import { useCurrentUser } from "./useCurrentUser";
 import { useUser } from "@clerk/clerk-expo";
 import { useUserProfileStore } from "@/store";
+
+
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
 export const useProfile = () => {
-  const profileApi = useApiClient("http://192.168.1.16:8080/api/user");
-  const userApi = useApiClient("http://192.168.1.16:8080/api/user");
-  const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
+  const profileApi = useApiClient(`${IP_URL}/api/user`);
+  const userApi = useApiClient(`${IP_URL}/api/user`);
+  const postApi = useApiClient(`${IP_URL}/api/posts`);
   const selectedUsername = useUserProfileStore(
     (state) => state.selectedUsername
   );

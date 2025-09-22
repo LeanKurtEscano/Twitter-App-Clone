@@ -6,6 +6,8 @@ import * as ImagePicker from "expo-image-picker";
 import { useUser } from "@clerk/clerk-expo";
 import { useApiClient } from "@/config/axiosInstance";
 
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
 export const useCreatePost = () => {
     const [content, setContent] = useState("");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -14,7 +16,7 @@ export const useCreatePost = () => {
 
     const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
     const CLOUDINARY_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_PRESET;
-     const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
+     const postApi = useApiClient(`${IP_URL}/api/posts`);
      const uploadToCloudinary = async (imageUri: string): Promise<string> => {
         try {
             const formData = new FormData();

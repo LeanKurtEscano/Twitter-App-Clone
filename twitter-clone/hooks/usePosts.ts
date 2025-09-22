@@ -3,8 +3,10 @@ import { LikeUser } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
 export const usePosts = (username?: string) => {
-  const postApi = useApiClient("http://192.168.1.16:8080/api/posts");
+  const postApi = useApiClient(`${IP_URL}/api/posts`);
   const user = useUser();
   const queryClient = useQueryClient();
 

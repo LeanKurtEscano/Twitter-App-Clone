@@ -4,9 +4,13 @@ import { Alert } from "react-native";
 
 import { useApiClient } from "@/config/axiosInstance";
 import { useUser } from "@clerk/clerk-expo";
+
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
+
 export const useComments = () => {
   const [commentText, setCommentText] = useState("");
-  const commentsApi = useApiClient("http://192.168.1.16:8080/api/comments");
+  const commentsApi = useApiClient(`${IP_URL}/api/comments`);
   const clerkUser = useUser();
   const queryClient = useQueryClient();
 

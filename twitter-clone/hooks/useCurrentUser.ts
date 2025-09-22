@@ -2,10 +2,14 @@ import { useQuery } from "@tanstack/react-query"
 
 import { useApiClient } from "@/config/axiosInstance"
 import { useUser } from "@clerk/clerk-expo";
+
+
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
 export const useCurrentUser = () => {
 
-    const userApi = useApiClient("http://192.168.1.16:8080/api/user");
-    
+    const userApi = useApiClient(`${IP_URL}/api/user`);
+
     const clerkUser = useUser();
 
 

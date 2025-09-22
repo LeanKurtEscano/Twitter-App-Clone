@@ -20,6 +20,7 @@ interface PostCardProps {
 
 const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, postMap }: PostCardProps) => {
   const isOwnPost = post.user.id === currentUser.id;
+  const isOwnPostRetweet = post.retweetOf ? post.retweetOf.user.id === currentUser.id : false;
   const setSelectedUserClerkId = useUserProfileStore((state) => state.setSelectedUserClerkId);
   const setSelectedUsername = useUserProfileStore((state) => state.setSelectedUsername);
   const router = useRouter();
@@ -32,7 +33,13 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
   const hasRetweeted = Array.from(postMap.values()).some(
     p => p.retweetOf?.id === (post.retweetOf ? post.retweetOf.id : post.id) && p.user.id === currentUser.id
-  )
+  ) 
+
+
+  const noOfRetweets = Array.from(postMap.values()).filter(
+    p => p.retweetOf?.id === (post.retweetOf ? post.retweetOf.id : post.id)
+  ).length;
+
   const handleQuote = () => {
 
 
@@ -71,7 +78,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
             <Text className="text-gray-400 font-bold  text-md ml-1">
 
-              {post.user.username} reposted
+              {post.user.username} reposted 
 
             </Text>
 
@@ -80,7 +87,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
           <View className="flex-row p-4">
 
 
-            <TouchableOpacity activeOpacity={1} onPress={() => isOwnPost ? router.push("/(tabs)/profile") : goToUserProfile(post.user.clerkId)}>
+            <TouchableOpacity activeOpacity={1} onPress={() => isOwnPostRetweet ? router.push("/(tabs)/profile") : goToUserProfile(post.retweetOf?.user?.clerkId ?? "")}>
               <Image
                 source={{ uri: post.retweetOf?.user.profilePicture || "" }}
                 className="w-12 h-12 rounded-full mr-3"
@@ -127,7 +134,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
                 <TouchableOpacity onPress={() => setIsRetweetModalVisible(true)} className="flex-row items-center">
                   <Feather name="repeat" size={18} color={hasRetweeted ? "green" : "#657786"} />
-                  <Text className="text-gray-500 text-sm ml-2">0 </Text>
+                  <Text className="text-gray-500 text-sm ml-2">{formatNumber(noOfRetweets)} </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity activeOpacity={1} className="flex-row items-center" onPress={() => onLike(post.retweetOf!.id)}>
@@ -199,7 +206,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
 
               <TouchableOpacity onPress={() => setIsRetweetModalVisible(true)} className="flex-row items-center">
                 <Feather name="repeat" size={18} color={hasRetweeted ? "green" : "#657786"} />
-                <Text className="text-gray-500 text-sm ml-2">0</Text>
+                <Text className="text-gray-500 text-sm ml-2">{formatNumber(noOfRetweets)}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity activeOpacity={1} className="flex-row items-center" onPress={() => onLike(post.id)}>
@@ -228,6 +235,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
         onClose={() => setIsRetweetModalVisible(false)}
         onRepost={() => post?.retweetOf ? handleRetweetPost(post.retweetOf.id) : handleRetweetPost(post.id)}
         onQuote={handleQuote}
+        isRetweeted={hasRetweeted}
       />
     </View>
   );

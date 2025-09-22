@@ -2,8 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiClient } from "@/config/axiosInstance";
 import { useUser } from "@clerk/clerk-expo";
 
+
+const IP_URL = process.env.EXPO_PUBLIC_IP_URL;
 export const useNotifications = () => {
-  const notificationApi = useApiClient("http://192.168.1.16:8080/api/notifications");
+  const notificationApi = useApiClient(`${IP_URL}/api/notifications`);
   const queryClient = useQueryClient();
   const user = useUser();
   const {
