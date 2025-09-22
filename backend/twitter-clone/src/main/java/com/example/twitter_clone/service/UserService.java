@@ -132,6 +132,26 @@ public class UserService {
     }
 
 
+
+
+    public List<User> getFollowers(Long id) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return followRepo.findFollowersByUserId(user.getId());
+    }
+
+    /**
+     * Get all users that a specific user is following (following)
+     */
+    public List<User> getFollowing(Long clerkId) {
+        User user = userRepo.findById(clerkId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return followRepo.findFollowingByUserId(user.getId());
+    }
+
+
 }
 
 

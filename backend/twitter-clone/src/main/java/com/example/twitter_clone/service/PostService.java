@@ -4,6 +4,7 @@ package com.example.twitter_clone.service;
 import ch.qos.logback.core.BasicStatusManager;
 import com.example.twitter_clone.dto.PostDTO;
 import com.example.twitter_clone.dto.PostResponseDTO;
+import com.example.twitter_clone.dto.RetweetDTO;
 import com.example.twitter_clone.exception.NotFoundException;
 import com.example.twitter_clone.model.Comment;
 import com.example.twitter_clone.model.Notification;
@@ -19,10 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -146,12 +144,53 @@ public List<PostResponseDTO> getAllPosts() {
     public void deletePost(Long postId) {
         commentRepo.deleteByPostId(postId);
 
-        // Step 2: delete likes (join table)
         postRepo.deleteLikesByPostId(postId);
 
-        // Step 3: delete post (parent table)
         postRepo.deletePostById(postId);
     }
+
+
+
+    public void retweetPost(Long postId, RetweetDTO dto) {
+        User user = userRepo.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Post originalPost = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Original post not found"));
+
+        // Check if the user already retweeted this post
+        Optional<Post> existingRetweet = postRepo.findByUserAndRetweetOf(user, originalPost);
+
+        if (existingRetweet.isPresent()) {
+
+            postRepo.delete(existingRetweet.get());
+            return;
+
+        }
+
+
+        Post retweet = Post.builder()
+                .user(user)
+                .content(dto.getComment())
+                .retweetOf(originalPost)
+                .build();
+
+        postRepo.save(retweet);
+
+
+        Notification notification = Notification.builder()
+                .from(user)
+                .to(originalPost.getUser())
+                .type("retweet")
+                .post(originalPost)
+                .build();
+
+        if (!user.equals(originalPost.getUser())) {
+            notificationRepo.save(notification);
+        }
+
+    }
+
 }
 
 

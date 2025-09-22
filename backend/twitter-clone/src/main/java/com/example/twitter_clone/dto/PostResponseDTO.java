@@ -23,8 +23,12 @@ public class PostResponseDTO {
     private LocalDateTime updatedAt;
 
     private UserPostDTO user;
+
+
     private List<UserPostDTO> likes; // safe list
     private List<CommentDTO> comments;
+
+    private PostResponseDTO retweetOf;
 
     @Data
     public static class CommentDTO {
@@ -73,6 +77,18 @@ public class PostResponseDTO {
                 .collect(Collectors.toList());
 
         dto.setComments(commentDTOs);
+
+        if (post.getRetweetOf() != null) {
+            Post original = post.getRetweetOf();
+            dto.setRetweetOf(new PostResponseDTO());
+            dto.getRetweetOf().setId(original.getId());
+            dto.getRetweetOf().setContent(original.getContent());
+            dto.getRetweetOf().setImage(original.getImage());
+            dto.getRetweetOf().setLikes(original.getLikes().stream().map(PostResponseDTO :: toUserPostDTO).collect(Collectors.toList()));
+            dto.getRetweetOf().setCreatedAt(original.getCreatedAt());
+            dto.getRetweetOf().setUpdatedAt(original.getUpdatedAt());
+            dto.getRetweetOf().setUser(toUserPostDTO(original.getUser()));
+        }
 
         return dto;
     }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUser(User user);
@@ -19,7 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user ORDER BY p.createdAt DESC")
     List<Post> findAllOrderByCreatedAtDesc();
-
+    Optional<Post>findByUserAndRetweetOf(User user, Post post);
 
     @Modifying
     @Query(value = "DELETE FROM post_likes WHERE post_id = :postId", nativeQuery = true)

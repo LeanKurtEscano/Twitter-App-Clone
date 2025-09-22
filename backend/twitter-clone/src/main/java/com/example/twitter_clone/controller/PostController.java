@@ -4,6 +4,7 @@ package com.example.twitter_clone.controller;
 import com.example.twitter_clone.dto.LikePostDTO;
 import com.example.twitter_clone.dto.PostDTO;
 import com.example.twitter_clone.dto.PostResponseDTO;
+import com.example.twitter_clone.dto.RetweetDTO;
 import com.example.twitter_clone.model.Post;
 import com.example.twitter_clone.model.User;
 import com.example.twitter_clone.service.PostService;
@@ -59,6 +60,16 @@ public class PostController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
+    }
+
+    @PostMapping("/{postId}/retweet")
+    public ResponseEntity<?> retweetPost(@PathVariable Long postId, @RequestBody RetweetDTO dto ){
+
+
+        postService.retweetPost(postId,dto);
+
+
+        return ResponseEntity.ok("Successfully Retweeted Post");
     }
 
     @PostMapping("/{postId}/like")

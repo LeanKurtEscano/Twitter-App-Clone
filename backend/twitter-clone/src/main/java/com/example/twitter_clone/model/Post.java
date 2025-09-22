@@ -51,6 +51,18 @@ public class Post {
     @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "retweet_post_id")
+    @JsonIgnoreProperties({"likes", "comments", "retweetOf"})
+    private Post retweetOf;
+
+
+    @OneToMany(mappedBy = "retweetOf", cascade = CascadeType.ALL)
+    @Builder.Default
+    @JsonIgnoreProperties({"likes", "comments", "retweetOf"})
+    private Set<Post> retweets = new HashSet<>();
+
+
     @Column(updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -61,5 +73,9 @@ public class Post {
     @PreUpdate
     public void setLastUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isRetweet() {
+        return retweetOf != null;
     }
 }

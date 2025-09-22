@@ -54,15 +54,15 @@ public class UserController {
     }
 
 
-   /*  @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<UserDTO>> getFollowers(@PathVariable Long userId) {
+     @GetMapping("/{userId}/followers")
+    public ResponseEntity<?> getFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowers(userId));
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<List<UserDTO>> getFollowing(@PathVariable Long userId) {
+    public ResponseEntity<?> getFollowing(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowing(userId));
-    }*/
+    }
 
 
 
