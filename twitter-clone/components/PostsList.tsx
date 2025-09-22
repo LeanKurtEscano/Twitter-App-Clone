@@ -10,8 +10,6 @@ const PostsList = ({username} : {username: string | null}) => {
   const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     
-
-  console.log(posts);
    const postMap: Map<string, Post> = new Map(posts.map((p: Post) => [p.id, p]));
 
 

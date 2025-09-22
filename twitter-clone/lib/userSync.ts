@@ -38,7 +38,6 @@ export const syncUserDataToBackend = async (userData: any, strategy: string) => 
             status: error.response?.status,
             data: error.response?.data,
         });
-        Alert.alert("Error", "Failed to sync your account with the server.");
         throw error;
     }
 }

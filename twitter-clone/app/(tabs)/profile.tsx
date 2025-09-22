@@ -1,11 +1,13 @@
 import EditProfileModal from "@/components/EditProfileModal";
+import FollowModal from "@/components/FollowModal";
 import PostsList from "@/components/PostsList";
 import SignOutButton from "@/components/SignOutButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import useFollow from "@/hooks/useFollow";
 import { usePosts } from "@/hooks/usePosts";
 import { useProfile } from "@/hooks/useProfile";
 import { Feather } from "@expo/vector-icons";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import {
   View,
   Text,
@@ -27,6 +29,18 @@ const ProfileScreens = () => {
     refetch: refetchPosts,
    
   } = usePosts();
+
+  const {
+    isFollowModalVisible,
+    openFollowModal,
+    closeFollowModal,
+    setHeader,
+    header,
+    setApiUrl,
+    apiUrl,
+    data,
+   
+  } = useFollow();
 
   const {
     isEditModalVisible,
@@ -122,13 +136,22 @@ const ProfileScreens = () => {
             </View>
 
             <View className="flex-row">
-              <TouchableOpacity className="mr-6">
+              <TouchableOpacity onPress={ () => {
+                setHeader("Following");
+                setApiUrl(`/${currentUser.id}/following`);
+                openFollowModal();
+                
+              }} className="mr-6">
                 <Text className="text-gray-900">
                   <Text className="font-bold">{currentUser.following?.length}</Text>
                   <Text className="text-gray-500"> Following</Text>
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={ () => {
+                setHeader("Followers");
+                setApiUrl(`/${currentUser.id}/followers`);
+                openFollowModal();
+              }}>
                 <Text className="text-gray-900">
                   <Text className="font-bold">{currentUser.followers?.length}</Text>
                   <Text className="text-gray-500"> Followers</Text>
@@ -148,6 +171,15 @@ const ProfileScreens = () => {
         saveProfile={saveProfile}
         updateFormField={updateFormField}
         isUpdating={isUpdating}
+      />
+
+      <FollowModal
+        isVisible={isFollowModalVisible}
+        onClose={closeFollowModal}
+        apiUrl={apiUrl}
+        users={data}
+        clerkId={currentUser?.clerkId!}
+        header={header}
       />
     </SafeAreaView>
   );

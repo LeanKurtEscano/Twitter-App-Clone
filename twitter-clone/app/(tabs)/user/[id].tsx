@@ -17,14 +17,25 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
-
+import useFollow from "@/hooks/useFollow";
+import FollowModal from "@/components/FollowModal";
 import { Followers } from "@/types";
 const UserProfileScreen = () => {
 
   const insets = useSafeAreaInsets();
 
   const { currentUser } = useCurrentUser();
+     const {
+    isFollowModalVisible,
+    openFollowModal,
+    closeFollowModal,
+    setHeader,
+    header,
+    setApiUrl,
+    apiUrl,
+    data,
+   
+  } = useFollow();
 
   const {
     profileUser,
@@ -149,15 +160,24 @@ const UserProfileScreen = () => {
             </View>
 
             <View className="flex-row">
-              <TouchableOpacity className="mr-6">
+              <TouchableOpacity onPress={ () => {
+                setHeader("Following");
+                setApiUrl(`/${profileUser.id}/following`);
+                openFollowModal();
+                
+              }} className="mr-6">
                 <Text className="text-gray-900">
-                  <Text className="font-bold">{profileUser?.following?.length}</Text>
+                  <Text className="font-bold">{profileUser.following?.length}</Text>
                   <Text className="text-gray-500"> Following</Text>
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={ () => {
+                setHeader("Followers");
+                setApiUrl(`/${profileUser.id}/followers`);
+                openFollowModal();
+              }}>
                 <Text className="text-gray-900">
-                  <Text className="font-bold">{profileUser?.followers?.length}</Text>
+                  <Text className="font-bold">{profileUser.followers?.length}</Text>
                   <Text className="text-gray-500"> Followers</Text>
                 </Text>
               </TouchableOpacity>
@@ -168,7 +188,14 @@ const UserProfileScreen = () => {
         <PostsList username={profileUser?.username} />
       </ScrollView>
 
-
+       <FollowModal
+        isVisible={isFollowModalVisible}
+        onClose={closeFollowModal}
+        apiUrl={apiUrl}
+        users={data}
+        clerkId={currentUser?.clerkId!}
+        header={header}
+      />
     </SafeAreaView>
   );
 };
