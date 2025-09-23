@@ -6,6 +6,8 @@ import { usePosts } from "@/hooks/usePosts";
 import { useProfile } from "@/hooks/useProfile";
 import { Feather } from "@expo/vector-icons";
 import { format } from "date-fns";
+import { useState } from "react";
+import { Ionicons } from '@expo/vector-icons'
 import {
   View,
   Text,
@@ -20,12 +22,14 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import useFollow from "@/hooks/useFollow";
 import FollowModal from "@/components/FollowModal";
 import { Followers } from "@/types";
+import Conversation from "@/components/Conversation";
 const UserProfileScreen = () => {
 
   const insets = useSafeAreaInsets();
-
+   
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const { currentUser } = useCurrentUser();
-     const {
+  const {
     isFollowModalVisible,
     openFollowModal,
     closeFollowModal,
@@ -34,7 +38,7 @@ const UserProfileScreen = () => {
     setApiUrl,
     apiUrl,
     data,
-   
+
   } = useFollow();
 
   const {
@@ -57,7 +61,7 @@ const UserProfileScreen = () => {
     );
   }
 
-  
+
 
   const handleFollow = (userId: string) => {
     followUser(userId);
@@ -109,17 +113,36 @@ const UserProfileScreen = () => {
               className="w-32 h-32 rounded-full border-4 border-white"
             />
 
-            <TouchableOpacity
-              className="bg-[#1DA1F2] rounded-full px-5 py-2"
-              activeOpacity={1}
-              onPress={() => {
-                handleFollow(profileUser?.id);
-              }}
-            >
-              <Text className="text-white font-bold text-sm">{profileUser?.followers?.some((follower: Followers) => follower.followerId === currentUser?.id) ? "Unfollow" : "Follow"}</Text>
-            </TouchableOpacity>
+            {/* Container for both buttons */}
+            <View className="flex-row gap-2 pb-3 items-center">
+              {/* Mail Button */}
+              <TouchableOpacity
+              onPress={() => setIsChatOpen(true)}
+                className="bg-[#1DA1F2] rounded-full p-1.5 active:bg-blue-600"
+                activeOpacity={1}
+              >
+                <View className="items-center justify-center">
+                  <Ionicons
+                    name="mail"
+                    size={19}
+                    color="white"
+                  />
+                </View>
+              </TouchableOpacity>
 
-
+              {/* Follow Button */}
+              <TouchableOpacity
+                className="bg-[#1DA1F2] rounded-full px-5 py-2"
+                activeOpacity={1}
+                onPress={() => {
+                  handleFollow(profileUser?.id);
+                }}
+              >
+                <Text className="text-white font-bold text-sm">
+                  {profileUser?.followers?.some((follower: Followers) => follower.followerId === currentUser?.id) ? "Unfollow" : "Follow"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View className="mb-4">
@@ -160,18 +183,18 @@ const UserProfileScreen = () => {
             </View>
 
             <View className="flex-row">
-              <TouchableOpacity onPress={ () => {
+              <TouchableOpacity onPress={() => {
                 setHeader("Following");
                 setApiUrl(`/${profileUser.id}/following`);
                 openFollowModal();
-                
+
               }} className="mr-6">
                 <Text className="text-gray-900">
                   <Text className="font-bold">{profileUser.following?.length}</Text>
                   <Text className="text-gray-500"> Following</Text>
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={ () => {
+              <TouchableOpacity onPress={() => {
                 setHeader("Followers");
                 setApiUrl(`/${profileUser.id}/followers`);
                 openFollowModal();
@@ -188,13 +211,20 @@ const UserProfileScreen = () => {
         <PostsList username={profileUser?.username} />
       </ScrollView>
 
-       <FollowModal
+      <FollowModal
         isVisible={isFollowModalVisible}
         onClose={closeFollowModal}
         apiUrl={apiUrl}
         users={data}
         clerkId={currentUser?.clerkId!}
         header={header}
+      />
+
+      <Conversation
+      isChatOpen={isChatOpen}
+      closeChatModal={() => setIsChatOpen(false)}
+        profileUser={profileUser}
+        myUserId={currentUser?.id!}
       />
     </SafeAreaView>
   );
