@@ -10,9 +10,21 @@ interface ProfileViewState {
 }
 
 
+interface SearchState {
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+}
+
+
 export const useUserProfileStore = create<ProfileViewState>((set) => ({
     selectedUserClerkId: null,
     selectedUsername: null,
     setSelectedUserClerkId: (id) => set({ selectedUserClerkId: id }),
     setSelectedUsername: (username) => set({ selectedUsername: username }),
-}));                                   
+}));             
+
+
+export const useSearchStore = create<SearchState>((set) => ({
+    searchQuery: "",
+    setSearchQuery: (query) => set({ searchQuery: query }),
+}));
