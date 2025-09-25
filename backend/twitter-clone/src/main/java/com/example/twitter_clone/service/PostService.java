@@ -191,6 +191,12 @@ public List<PostResponseDTO> getAllPosts() {
 
     }
 
+
+    public List<Post> searchPostsLatest(String keyword) {
+        return postRepo.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(keyword);
+    }
+
+
 }
 
 

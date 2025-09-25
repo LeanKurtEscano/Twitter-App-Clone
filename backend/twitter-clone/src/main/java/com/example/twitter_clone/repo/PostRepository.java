@@ -30,4 +30,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("DELETE FROM Post p WHERE p.id = :postId")
     void deletePostById(@Param("postId") Long postId);
 
+
+    List<Post> findByContentContainingIgnoreCase(String keyword);
+    List<Post> findByContentContainingIgnoreCaseOrderByCreatedAtDesc(String keyword);
+
 }

@@ -89,5 +89,12 @@ public class PostController {
     }
 
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPosts(@RequestParam String query) {
+        List<Post> posts = postService.searchPostsLatest(query);
+        return ResponseEntity.ok(posts);
+    }
+
+
 
 }
