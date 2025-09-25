@@ -20,6 +20,7 @@ interface FollowModalProps {
     clerkId: string;
     header: string;
 }
+import { UserItem } from "./UserCard";
 
 const FollowModal = ({
     header,
@@ -32,11 +33,7 @@ const FollowModal = ({
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
-    const { followUser } = useProfile();
-    const { currentUser } = useCurrentUser();
 
-
-    console.log("Followers Modal users:", currentUser?.following);
 
     useEffect(() => {
         if (users) {
@@ -50,65 +47,7 @@ const FollowModal = ({
         }
     }, [users, searchQuery]);
 
-    const renderUserItem = (user: User) => {
-        const isFollowed = currentUser?.following?.some(followedUser => followedUser.followedId === user.id);
-        const isUser = currentUser?.id === user.id;
-        return (
-            <TouchableOpacity
-                key={user.id}
-                className="flex-row items-center py-3 px-4"
-                onPress={() => {
 
-                    console.log("Navigate to user:", user.username);
-                }}
-            >
-                <View className="mr-3">
-                    {user.profilePicture ? (
-                        <Image
-                            source={{ uri: user.profilePicture }}
-                            className="w-12 h-12 rounded-full"
-                        />
-                    ) : (
-                        <View className="w-12 h-12 rounded-full bg-gray-300 items-center justify-center">
-                            <Text className="text-gray-600 font-semibold text-lg">
-                                {user.firstName.charAt(0).toUpperCase()}
-                            </Text>
-                        </View>
-                    )}
-                </View>
-
-                <View className="flex-1">
-                    <View className="flex-row items-center">
-                        <Text className="font-bold text-base text-black">
-                            {user.firstName} {user.lastName}
-                        </Text>
-                    </View>
-                    <Text className="text-gray-500 text-sm">@{user.username}</Text>
-                </View>
-                {isUser ? (null) : (
-                    <TouchableOpacity
-                        activeOpacity={1}
-                        className={`px-4 py-1.5 rounded-full border ${isFollowed
-                                ? 'bg-blue-500 border-blue-500'
-                                : 'border-gray-300 bg-white'
-                            }`}
-                        onPress={() => {
-                            followUser(user.id);
-                        }}
-                    >
-                        <Text className={`font-medium text-sm ${isFollowed ? 'text-white' : 'text-black'
-                            }`}>
-                            {isFollowed ? 'Unfollow' : 'Follow'}
-                        </Text>
-                    </TouchableOpacity>
-
-                )}
-
-
-            </TouchableOpacity>
-
-        )
-    };
 
     return (
         <Modal visible={isVisible} animationType="slide" presentationStyle="pageSheet">
@@ -144,7 +83,9 @@ const FollowModal = ({
                         </View>
                     ) : filteredUsers && filteredUsers.length > 0 ? (
                         <View className="py-2">
-                            {filteredUsers.map(renderUserItem)}
+                            {filteredUsers.map((user) => (
+                                <UserItem key={user.id} user={user} />
+                            ))}
                         </View>
                     ) : (
                         <View className="flex-1 items-center justify-center py-8">

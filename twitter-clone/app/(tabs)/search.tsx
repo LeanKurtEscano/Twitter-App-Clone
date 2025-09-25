@@ -8,6 +8,8 @@ import PostCard from '@/components/PostCard';
 import { usePosts } from '@/hooks/usePosts';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import CommentsModal from '@/components/CommentsModal';
+import SearchTabs from '@/components/SearchTabs';
+import { UserItem } from '@/components/UserCard';
 
 const SearchScreen = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -59,7 +61,7 @@ const SearchScreen = () => {
     if (hasSearched && searchQuery) {
       refetchSearchPost();
     }
-  }, [searchQuery, hasSearched, refetchSearchPost]);
+  }, [searchQuery, hasSearched, refetchSearchPost,activeTab,setActiveTab]);
 
   const handleInputChange = (text: string) => {
     setSearchInput(text);
@@ -96,43 +98,7 @@ const SearchScreen = () => {
 
       {/* NAVIGATION TABS - Only show when user has searched */}
       {hasSearched && (
-        <View className="border-b border-gray-100">
-          <View className="flex-row px-4 relative">
-            <TouchableOpacity
-              onPress={() => handleTabPress('posts')}
-              className="flex-1 py-4"
-            >
-              <Text className={`text-center font-medium ${activeTab === 'posts' ? 'text-blue-500' : 'text-gray-600'}`}>
-                Top
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleTabPress('posts')}
-              className="flex-1 py-4"
-            >
-              <Text className="text-center font-medium text-gray-600">
-                Latest
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleTabPress('user')}
-              className="flex-1 py-4"
-            >
-              <Text className={`text-center font-medium ${activeTab === 'user' ? 'text-blue-500' : 'text-gray-600'}`}>
-                People
-              </Text>
-            </TouchableOpacity>
-            
-            
-            <View
-              className="absolute bottom-0 h-0.5 bg-blue-500 transition-all duration-300 ease-in-out"
-              style={{
-                width: '33.333%',
-                left: activeTab === 'posts' ? '0%' : activeTab === 'user' ? '66.666%' : '33.333%',
-              }}
-            />
-          </View>
-        </View>
+        <SearchTabs activeTab={activeTab} setActiveTab={handleTabPress} />
       )}
 
  
@@ -175,8 +141,8 @@ const SearchScreen = () => {
               <>
                 {/* User search results - implement user cards here */}
                 {searchResults.map((user: any) => (
-                  <View key={user.id} className="p-4 border-b border-gray-100">
-                    <Text>{user.name || user.username || 'Unknown User'}</Text>
+                  <View key={user.id} className="p-2 border-b border-gray-100">
+                     <UserItem user={user} key={user.id} />
                   </View>
                 ))}
               </>
