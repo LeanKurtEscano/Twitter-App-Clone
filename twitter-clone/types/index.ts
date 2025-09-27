@@ -7,7 +7,7 @@ export interface User {
   profilePicture?: string;
 }
 
-export interface Comment {
+export interface AppComment {
   id: string;
   content: string;
   createdAt: string;
@@ -21,7 +21,7 @@ export interface Post {
   createdAt: string;
   user: User;
   likes: string[];
-  comments: Comment[];
+  comments: AppComment[];
   retweetOf?: Post | null;
 }
 

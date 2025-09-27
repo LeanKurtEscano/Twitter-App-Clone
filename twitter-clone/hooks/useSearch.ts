@@ -1,8 +1,7 @@
 
-import React from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 
-import { useSearchStore } from '@/store';
 const ip_url = process.env.EXPO_PUBLIC_IP_URL;
 import { useState } from 'react';
 import { useApiClient } from '@/config/axiosInstance';
@@ -18,7 +17,7 @@ export const useSearch = (topic:string) => {
   queryFn: async () => {
     
     try {
-      const response = await apiService.get(`/search?query=${searchQuery}`);
+      const response = await apiService.get( topic === "top" ? `/search?query=${searchQuery}&topic=${topic}` : `/search?query=${searchQuery}`);
       console.log('✅ Search response:', response.data);
       return response.data;
     } catch (error) {

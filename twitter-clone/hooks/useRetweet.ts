@@ -14,6 +14,8 @@ export const useRetweet = () => {
 
   const retweetPostMutation = useMutation({
     mutationFn: async ({ postId, comment }: { postId: string; comment?: string | null }) => {
+
+      console.log("Retweeting postId:", postId, "with comment:", comment);
       const response = await postApi.post(`/${postId}/retweet`, {
         userId: currentUser?.id,
         comment: comment || null,

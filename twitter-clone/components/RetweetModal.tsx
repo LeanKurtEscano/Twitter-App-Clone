@@ -2,17 +2,27 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
+import { useRetweetModalStore, useRetweetQuoteStore } from '@/store';
+import { Post } from '@/types';
 
 interface RetweetModalProps {
   isVisible?: boolean;
   onClose?: () => void;
   onRepost?: () => void;
-  onQuote?: () => void;
-
+  postToQuote: Post;
   isRetweeted?: boolean;
 }
 
-export const RetweetModal = ({ isVisible = false, onClose, onRepost, onQuote, isRetweeted }: RetweetModalProps) => {
+export const RetweetModal = ({ isVisible = false, onClose, onRepost, isRetweeted , postToQuote}: RetweetModalProps) => {
+  const storeRetweetQuote = useRetweetQuoteStore((state) => state.storeRetweetQuote);
+  const clearRetweetQuote = useRetweetQuoteStore((state) => state.clearRetweetQuote);
+
+  const { openModal } = useRetweetModalStore();
+
+   const handleQuote = () => {;
+    clearRetweetQuote();
+    storeRetweetQuote(postToQuote);
+  };
   return (
     <Modal
       visible={isVisible}
@@ -74,7 +84,8 @@ export const RetweetModal = ({ isVisible = false, onClose, onRepost, onQuote, is
             <TouchableOpacity
               className="flex-row items-center px-8 py-6"
               onPress={() => {
-                onQuote?.();
+                handleQuote();
+                openModal();
                 onClose?.();
               }}
               activeOpacity={0.7}

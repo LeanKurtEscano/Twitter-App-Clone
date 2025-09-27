@@ -5,13 +5,13 @@ import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import PostCard from "./PostCard";
 import CommentsModal from "./CommentsModal";
+import { useRetweetModalStore } from "@/store";
 const PostsList = ({username} : {username: string | null}) => {
   const { currentUser } = useCurrentUser();
   const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     
    const postMap: Map<string, Post> = new Map(posts.map((p: Post) => [p.id, p]));
-
 
   const selectedPost = selectedPostId ? posts.find((p: Post) => p.id === selectedPostId) : null;
 
@@ -60,6 +60,8 @@ const PostsList = ({username} : {username: string | null}) => {
 
       
       <CommentsModal selectedPost={selectedPost} onClose={() => setSelectedPostId(null)} />
+
+
     </>
   );
 };
