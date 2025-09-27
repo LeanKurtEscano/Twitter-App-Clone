@@ -78,25 +78,28 @@ export const RetweetModal = ({ isVisible = false, onClose, onRepost, isRetweeted
           
 
           
-            <View className="border-t border-gray-100 mx-8" />
+            {!isRetweeted && (
+  <>
+    <View className="border-t border-gray-100 mx-8" />
 
-           
-            <TouchableOpacity
-              className="flex-row items-center px-8 py-6"
-              onPress={() => {
-                handleQuote();
-                openModal();
-                onClose?.();
-              }}
-              activeOpacity={0.7}
-            >
-              <View className="mr-6">
-                <Feather name="edit-3" size={28} color="#374151" />
-              </View>
-              <View>
-                <Text className="text-gray-900 font-medium text-lg">Quote</Text>
-              </View>
-            </TouchableOpacity>
+    <TouchableOpacity
+      className="flex-row items-center px-8 py-6"
+      onPress={() => {
+        handleQuote();
+        openModal();
+        onClose?.();
+      }}
+      activeOpacity={0.7}
+    >
+      <View className="mr-6">
+        <Feather name="edit-3" size={28} color="#374151" />
+      </View>
+      <View>
+        <Text className="text-gray-900 font-medium text-lg">Quote</Text>
+      </View>
+    </TouchableOpacity>
+  </>
+)}
           </View>
         </TouchableOpacity>
       </TouchableOpacity>
