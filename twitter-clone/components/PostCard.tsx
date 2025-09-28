@@ -17,11 +17,11 @@ interface PostCardProps {
   onComment: (post: Post) => void;
   isLiked?: boolean;
   postMap: Map<string, Post>;
-
+  onPostUpdate?: () => void; // New prop for post update callback
   currentUser: User;
 }
 
-const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, postMap }: PostCardProps) => {
+const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, postMap, onPostUpdate }: PostCardProps) => {
   const isOwnPost = post.user.id === currentUser.id;
   const isOwnPostRetweet = post.retweetOf ? post.retweetOf.user.id === currentUser.id : false;
   const setSelectedUserClerkId = useUserProfileStore((state) => state.setSelectedUserClerkId);
@@ -248,7 +248,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
             )}
 
             <View className="flex-row justify-between max-w-xs">
-              <TouchableOpacity className="flex-row items-center" onPress={() => onComment(post)}>
+              <TouchableOpacity className="flex-row items-center" onPress={() => {onComment(post); }}>
                 <Feather name="message-circle" size={18} color="#657786" />
                 <Text className="text-gray-500 text-sm ml-2">
                   {formatNumber(post.comments?.length || 0)}
@@ -263,7 +263,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
                 <Text className="text-gray-500 text-sm ml-2">{formatNumber(noOfRetweets)}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity activeOpacity={1} className="flex-row items-center" onPress={() => onLike(post.id)}>
+              <TouchableOpacity activeOpacity={1} className="flex-row items-center" onPress={() => { onLike(post.id);  onPostUpdate?.();}}>
                 {isLiked ? (
                   <AntDesign name="heart" size={18} color={isLiked ? "red" : "#657786"} />
                 ) : (
@@ -287,6 +287,7 @@ const PostCard = ({ currentUser, onDelete, onLike, post, isLiked, onComment, pos
       <RetweetModal
         postToQuote={post.retweetOf ? post.retweetOf : post}
         isVisible={isRetweetModalVisible}
+        onPostUpdate={onPostUpdate}
         onClose={() => setIsRetweetModalVisible(false)}
         onRepost={() => post?.retweetOf ? handleRetweetPost(post.retweetOf.id) : handleRetweetPost(post.id)}
 

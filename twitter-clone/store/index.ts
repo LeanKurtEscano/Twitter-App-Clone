@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 import { AppComment, Post } from "@/types";
 import { User } from "@/types";
+
+
 interface ProfileViewState {
     selectedUsername: string | null;
     setSelectedUsername: (username: string | null) => void;
@@ -9,7 +11,11 @@ interface ProfileViewState {
     setSelectedUserClerkId: (id: string | null) => void;
 }
 
-
+interface RetweetModalState {
+  isVisible: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+}
 interface SearchState {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -20,7 +26,7 @@ interface RetweetQuoteState {
   post: Post | null;               
   storeRetweetQuote: (post: Post | null) => void;
   
-  clearRetweetQuote: () => void; // ✅
+  clearRetweetQuote: () => void; 
 }
 
 
@@ -39,18 +45,12 @@ export const useSearchStore = create<SearchState>((set) => ({
 }));
 
 export const useRetweetQuoteStore = create<RetweetQuoteState>((set) => ({
-  post: null, // nothing selected initially
+  post: null, 
 
-  storeRetweetQuote: (post) => set({ post }), // can be Post or null
-  clearRetweetQuote: () => set({ post: null }), // ✅
+  storeRetweetQuote: (post) => set({ post }),
+  clearRetweetQuote: () => set({ post: null }), 
 }));
 
-
-interface RetweetModalState {
-  isVisible: boolean;
-  openModal: () => void;
-  closeModal: () => void;
-}
 
 
 export const useRetweetModalStore = create<RetweetModalState>((set) => ({

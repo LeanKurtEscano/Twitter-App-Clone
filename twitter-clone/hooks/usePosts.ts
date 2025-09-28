@@ -41,6 +41,7 @@ export const usePosts = (username?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.refetchQueries({ queryKey: ["search"], exact: false });
       if (username) queryClient.invalidateQueries({ queryKey: ["posts", username] });
     },
   });
@@ -52,6 +53,7 @@ export const usePosts = (username?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.refetchQueries({ queryKey: ["search"], exact: false });
       if (username) queryClient.invalidateQueries({ queryKey: ["posts", username] });
     },
   });

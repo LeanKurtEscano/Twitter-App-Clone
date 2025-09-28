@@ -23,6 +23,7 @@ export const useComments = () => {
     },
     onSuccess: () => {
       setCommentText("");
+       queryClient.refetchQueries({ queryKey: ["search"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: () => {
