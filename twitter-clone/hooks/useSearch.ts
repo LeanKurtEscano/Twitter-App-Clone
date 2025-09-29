@@ -26,7 +26,6 @@ export const useSearch = (topic:string) => {
       throw error;
     }
   },
-  enabled: false
 });
 
 
