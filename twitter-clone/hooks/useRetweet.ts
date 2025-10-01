@@ -26,7 +26,8 @@ export const useRetweet = () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
        queryClient.invalidateQueries({ queryKey: ["authUser"] });
-     queryClient.refetchQueries({ queryKey: ["search"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["search"] });
+
     },
   });
 

@@ -6,9 +6,10 @@ import { View, Text, Alert, Image, TouchableOpacity } from "react-native";
 interface NotificationCardProps {
   notification: Notification;
   onDelete: (notificationId: string) => void;
+  onMarkAsRead?: (notificationId: string) => void;
 }
 
-const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => {
+const NotificationCard = ({ notification, onDelete, onMarkAsRead }: NotificationCardProps) => {
   const getNotificationText = () => {
     const name = `${notification.from.firstName} ${notification.from.lastName}`;
     switch (notification.type) {
@@ -47,16 +48,34 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
     ]);
   };
 
+  const handlePress = () => {
+    // Mark as read when tapped
+    if (!notification.isRead && onMarkAsRead) {
+      onMarkAsRead(notification.id);
+    }
+  };
+
   return (
-    <View className="border-b border-gray-100 bg-white">
+    <TouchableOpacity 
+      onPress={handlePress}
+      activeOpacity={0.7}
+      className={`border-b border-gray-100 ${notification.isRead ? 'bg-white' : 'bg-blue-50/30'}`}
+    >
       <View className="flex-row p-4">
-        <View className="relative mr-3">
+        {/* Unread indicator dot */}
+        {!notification.isRead && (
+          <View className="absolute left-2 top-1/2 -translate-y-1/2">
+            <View className="size-2 rounded-full bg-blue-500" />
+          </View>
+        )}
+
+        <View className="relative mr-3 ml-2">
           <Image
             source={{ uri: notification.from.profilePicture }}
             className="size-12 rounded-full"
           />
 
-          <View className="abolute -bottom-1 -right-1 size-6 bg-white items-center justify-center">
+          <View className="absolute -bottom-1 -right-1 size-6 rounded-full bg-white items-center justify-center shadow-sm">
             {getNotificationIcon()}
           </View>
         </View>
@@ -65,12 +84,14 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
           <View className="flex-row items-start justify-between mb-1">
             <View className="flex-1">
               <Text className="text-gray-900 text-base leading-5 mb-1">
-                <Text className="font-semibold">
+                <Text className={`font-semibold ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
                   {notification.from.firstName} {notification.from.lastName}
                 </Text>
                 <Text className="text-gray-500"> @{notification.from.username}</Text>
               </Text>
-              <Text className="text-gray-700 text-sm mb-2">{getNotificationText()}</Text>
+              <Text className={`text-sm mb-2 ${!notification.isRead ? 'text-gray-800 font-medium' : 'text-gray-700'}`}>
+                {getNotificationText()}
+              </Text>
             </View>
 
             <TouchableOpacity className="ml-2 p-1" onPress={handleDelete}>
@@ -102,10 +123,20 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
             </View>
           )}
 
-          <Text className="text-gray-400 text-xs">{formatDate(notification.createdAt)}</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-gray-400 text-xs">{formatDate(notification.createdAt)}</Text>
+            
+            {!notification.isRead && (
+              <View className="flex-row items-center">
+                <View className="size-1.5 rounded-full bg-blue-500 mr-1" />
+                <Text className="text-blue-600 text-xs font-medium">New</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
+
 export default NotificationCard;
