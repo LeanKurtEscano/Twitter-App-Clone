@@ -65,5 +65,15 @@ public class UserController {
     }
 
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(@RequestParam String query) {
+        System.out.println("User");
+        System.out.println(query);
+        List<User> users = userService.searchUsersByUsername(query);
+
+        System.out.println(users);
+        return ResponseEntity.ok(users);
+    }
+
 
 }

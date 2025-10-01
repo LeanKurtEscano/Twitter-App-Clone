@@ -1,5 +1,6 @@
 package com.example.twitter_clone.service;
 
+import com.example.twitter_clone.controller.NotificationController;
 import com.example.twitter_clone.dto.SyncDTO;
 import com.example.twitter_clone.dto.UpdateProfileDto;
 import com.example.twitter_clone.dto.UserDTO;
@@ -32,6 +33,9 @@ public class UserService {
     @Autowired
     private NotificationRepository notificationRepo;
 
+
+    @Autowired
+    private NotificationController notificationController;
 
     public void registerUser(SyncDTO dto) {
            boolean user = userRepo.findByClerkId(dto.getClerkUserId()).isPresent();
@@ -98,6 +102,9 @@ public class UserService {
                     .build();
 
             notificationRepo.save(notification);
+
+
+            notificationController.sendNotificationToUser(String.valueOf(followerId), notification);
         }
     }
 
@@ -149,6 +156,11 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return followRepo.findFollowingByUserId(user.getId());
+    }
+
+
+    public List<User> searchUsersByUsername(String keyword) {
+        return userRepo.findByUsernameContainingIgnoreCaseOrderByCreatedAtDesc(keyword);
     }
 
 

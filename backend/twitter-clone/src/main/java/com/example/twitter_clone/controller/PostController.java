@@ -90,11 +90,25 @@ public class PostController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchPosts(@RequestParam String query) {
-        List<Post> posts = postService.searchPostsLatest(query);
+    public ResponseEntity<?> searchPosts(
+            @RequestParam String query,
+            @RequestParam(required = false) String topic
+    ) {
+        System.out.println("Post search request");
+        System.out.println("Query: " + query);
+        System.out.println("Topic: " + topic);
+
+        List<PostResponseDTO> posts;
+
+        if ("top".equalsIgnoreCase(topic)) {
+            posts = postService.searchMostTrendingPosts(query);
+        } else {
+            posts = postService.searchPostsLatest(query);
+        }
+
+        System.out.println(posts);
         return ResponseEntity.ok(posts);
     }
-
 
 
 }

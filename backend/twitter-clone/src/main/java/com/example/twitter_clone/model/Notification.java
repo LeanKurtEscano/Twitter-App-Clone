@@ -64,6 +64,9 @@ public class Notification {
     )
     private Notification notification;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isRead = false;
+
     @Column(updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

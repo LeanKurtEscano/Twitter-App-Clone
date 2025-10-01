@@ -34,4 +34,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByContentContainingIgnoreCase(String keyword);
     List<Post> findByContentContainingIgnoreCaseOrderByCreatedAtDesc(String keyword);
 
+
+
+    @Query(value = """
+    SELECT p.*  FROM posts p
+    LEFT JOIN post_likes pl ON p.id = pl.post_id
+    WHERE LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    GROUP BY p.id
+    ORDER BY COUNT(pl.user_id) DESC
+    """, nativeQuery = true)
+    List<Post> findAllOrderByLikesDescWithKeyword(@Param("keyword") String keyword);
+
+
 }

@@ -25,6 +25,7 @@ public class NotificationDTO {
     private Long id;
     private String type;
     private LocalDateTime createdAt;
+    private boolean isRead;
 
     // From user info
     private UserBasicDTO from;
@@ -70,6 +71,7 @@ public class NotificationDTO {
                 .id(notif.getId())
                 .type(notif.getType())
                 .createdAt(notif.getCreatedAt())
+                .isRead(notif.isRead())
                 .from(notif.getFrom() != null ? UserBasicDTO.builder()
                         .firstName(notif.getFrom().getFirstName())
                         .lastName(notif.getFrom().getLastName())

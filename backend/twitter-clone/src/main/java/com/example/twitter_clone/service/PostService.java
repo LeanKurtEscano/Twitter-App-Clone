@@ -2,6 +2,7 @@ package com.example.twitter_clone.service;
 
 
 import ch.qos.logback.core.BasicStatusManager;
+import com.example.twitter_clone.controller.NotificationController;
 import com.example.twitter_clone.dto.PostDTO;
 import com.example.twitter_clone.dto.PostResponseDTO;
 import com.example.twitter_clone.dto.RetweetDTO;
@@ -43,6 +44,9 @@ public class PostService {
     private NotificationRepository notificationRepo;
 
 
+
+    @Autowired
+    private NotificationController notificationController;
 
     /*
       public List<Post> getAllPost() {
@@ -117,6 +121,12 @@ public List<PostResponseDTO> getAllPosts() {
                         .post(post)
                         .build();
                 notificationRepo.save(notification);
+
+
+                notificationController.sendNotificationToUser(
+                        String.valueOf(post.getUser().getId()),
+                        notification
+                );
             }
 
             return "Post liked successfully";
@@ -185,6 +195,11 @@ public List<PostResponseDTO> getAllPosts() {
                 .post(originalPost)
                 .build();
 
+        notificationController.sendNotificationToUser(
+                String.valueOf(originalPost.getUser().getId()),
+                notification
+        );
+
         if (!user.equals(originalPost.getUser())) {
             notificationRepo.save(notification);
         }
@@ -192,9 +207,29 @@ public List<PostResponseDTO> getAllPosts() {
     }
 
 
-    public List<Post> searchPostsLatest(String keyword) {
-        return postRepo.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(keyword);
+    public List<PostResponseDTO> searchPostsLatest(String keyword) {
+        List<Post> posts = postRepo.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(keyword);
+
+        return posts.stream().map(
+                post ->  {
+                    List<Comment> comments = commentService.getAllComments(post.getId());
+                    return  PostResponseDTO.fromEntity(post, comments);
+                }
+        ).collect(Collectors.toList());
     }
+
+
+    public List<PostResponseDTO> searchMostTrendingPosts(String keyword) {
+        List<Post> posts = postRepo.findAllOrderByLikesDescWithKeyword(keyword);
+
+        return posts.stream().map(
+                post ->  {
+                    List<Comment> comments = commentService.getAllComments(post.getId());
+                    return  PostResponseDTO.fromEntity(post, comments);
+                }
+        ).collect(Collectors.toList());
+    }
+
 
 
 }

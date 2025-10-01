@@ -1,6 +1,7 @@
 package com.example.twitter_clone.service;
 
 
+import com.example.twitter_clone.controller.NotificationController;
 import com.example.twitter_clone.dto.CommentDTO;
 import com.example.twitter_clone.exception.NotFoundException;
 import com.example.twitter_clone.model.Comment;
@@ -37,7 +38,8 @@ public class CommentService {
     @Autowired
     private NotificationRepository notificationRepo;
 
-
+    @Autowired
+    private NotificationController notificationController;
 
     public void createComment(CommentDTO dto) {
         User user = userRepo.findByClerkId(dto.getClerkUserId())
@@ -64,6 +66,11 @@ public class CommentService {
                     .comment(comment)
                     .build();
             notificationRepo.save(notification);
+
+            notificationController.sendNotificationToUser(
+                    String.valueOf(post.getUser().getId()),
+                    notification
+            );
         }
 
 
