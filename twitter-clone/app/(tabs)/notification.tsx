@@ -3,6 +3,7 @@ import NotificationCard from "@/components/NotificationCard";
 import { useNotifications } from "@/hooks/useNotification";
 import { Notification } from "@/types";
 import { Feather } from "@expo/vector-icons";
+import { useEffect } from "react";
 import {
   View,
   Text,
@@ -14,10 +15,15 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const NotificationsScreen = () => {
-  const { notifications, isLoading, error, refetch, isRefetching, deleteNotification } =
+  const { notifications, isLoading, error, refetch, isRefetching, deleteNotification,markAllAsRead } =
     useNotifications();
 
-
+   
+    useEffect(( ) => {
+      if (notifications.length > 0) {
+        markAllAsRead();
+      }
+    },[notifications])
   const insets = useSafeAreaInsets();
 
   if (error) {

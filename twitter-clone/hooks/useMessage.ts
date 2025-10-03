@@ -1,9 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
-import { useAuth } from "@clerk/clerk-expo";
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  orderBy, 
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  or,
+  and
+} from "firebase/firestore";
 
-const expo_url = process.env.EXPO_PUBLIC_IP_URL;
+import { db } from "@/config/firebase";
+
 interface ChatMessage {
   fromId: string;
   toId: string;
@@ -14,73 +24,69 @@ interface ChatMessage {
 export const useMessage = (myUserId: string, otherUserId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [connected, setConnected] = useState(false); 
-  const clientRef = useRef<Client | null>(null);
-  const { getToken } = useAuth();
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
-    let isMounted = true;
+    if (!myUserId || !otherUserId) return;
 
-    const setupClient = async () => {
-      const token = await getToken(); // ✅ wait for Clerk token
+    // Create a query to get messages between the two users
+    const messagesRef = collection(db, "messages");
+    const q = query(
+      messagesRef,
+      or(
+        and(
+          where("fromId", "==", myUserId),
+          where("toId", "==", otherUserId)
+        ),
+        and(
+          where("fromId", "==", otherUserId),
+          where("toId", "==", myUserId)
+        )
+      ),
+      orderBy("timestamp", "asc")
+    );
 
-      const client = new Client({
-        webSocketFactory: () => new SockJS(`${expo_url}/ws`),
-        connectHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-        reconnectDelay: 5000,
-        onConnect: () => {
-          if (!isMounted) return;
-          console.log("✅ Connected to WebSocket");
-          setConnected(true);
-
-          client.subscribe("/user/queue/messages", (msg) => {
-            const body: ChatMessage = JSON.parse(msg.body);
-            setMessages((prev) => [...prev, body]);
-          });
-        },
-        onDisconnect: () => {
-          console.log("❌ Disconnected from WebSocket");
-          setConnected(false);
-        },
+    // Subscribe to real-time updates
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const messagesData: ChatMessage[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        messagesData.push({
+          fromId: data.fromId,
+          toId: data.toId,
+          content: data.content,
+          timestamp: data.timestamp?.toMillis() || Date.now(),
+        });
       });
-
-      client.activate();
-      clientRef.current = client;
-    };
-
-    setupClient();
-
-    return () => {
-      isMounted = false;
-      clientRef.current?.deactivate();
-      clientRef.current = null;
-    };
-  }, [myUserId, getToken]);
-
-  const sendMessage = () => {
-    if (!newMessage.trim()) return;
-    if (!connected || !clientRef.current) {
-      console.warn("⚠️ Cannot send message, not connected yet");
-      return;
-    }
-
-    const msg: ChatMessage = {
-      fromId: myUserId,
-      toId: otherUserId,
-      content: newMessage,
-      timestamp: Date.now(),
-    };
-
-    clientRef.current.publish({
-      destination: "/app/chat.send",
-      body: JSON.stringify(msg),
+      setMessages(messagesData);
     });
 
-    setMessages((prev) => [...prev, msg]); 
-    setNewMessage("");
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [myUserId, otherUserId]);
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !myUserId || !otherUserId) return;
+
+    try {
+      const messagesRef = collection(db, "messages");
+      await addDoc(messagesRef, {
+        fromId: myUserId,
+        toId: otherUserId,
+        content: newMessage.trim(),
+        timestamp: serverTimestamp(),
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
-  return { messages, newMessage, setNewMessage, sendMessage, connected };
+  return {
+    messages,
+    newMessage,
+    setNewMessage,
+    sendMessage,
+    scrollViewRef,
+  };
 };

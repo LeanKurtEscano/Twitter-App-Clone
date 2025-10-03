@@ -21,7 +21,7 @@ export const RetweetModal = ({ isVisible = false, onClose, onRepost, isRetweeted
   const { openModal } = useRetweetModalStore();
 
   const handleQuote = () => {
-    ;
+    
     clearRetweetQuote();
     storeRetweetQuote(postToQuote);
   };

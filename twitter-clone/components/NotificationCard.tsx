@@ -14,11 +14,11 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }: Notification
     const name = `${notification.from.firstName} ${notification.from.lastName}`;
     switch (notification.type) {
       case "like":
-        return `${name} liked your post`;
+        return `liked your post`;
       case "comment":
-        return `${name} commented on your post`;
+        return `commented on your post`;
       case "follow":
-        return `${name} started following you`;
+        return `started following you`;
       default:
         return "";
     }
@@ -27,13 +27,13 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }: Notification
   const getNotificationIcon = () => {
     switch (notification.type) {
       case "like":
-        return <Feather name="heart" size={20} color="#E0245E" />;
+        return { icon: "heart", color: "#E0245E", bg: "#FEE2E2" };
       case "comment":
-        return <Feather name="message-circle" size={20} color="#1DA1F2" />;
+        return { icon: "message-circle", color: "#1DA1F2", bg: "#DBEAFE" };
       case "follow":
-        return <Feather name="user-plus" size={20} color="#17BF63" />;
+        return { icon: "user-plus", color: "#10B981", bg: "#D1FAE5" };
       default:
-        return <Feather name="bell" size={20} color="#657786" />;
+        return { icon: "bell", color: "#6B7280", bg: "#F3F4F6" };
     }
   };
 
@@ -49,90 +49,97 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }: Notification
   };
 
   const handlePress = () => {
-    // Mark as read when tapped
     if (!notification.isRead && onMarkAsRead) {
       onMarkAsRead(notification.id);
     }
   };
 
+  const iconConfig = getNotificationIcon();
+
   return (
     <TouchableOpacity 
       onPress={handlePress}
       activeOpacity={0.7}
-      className={`border-b border-gray-100 ${notification.isRead ? 'bg-white' : 'bg-blue-50/30'}`}
+      className={`border-b border-gray-200 ${notification.isRead ? 'bg-white' : 'bg-blue-50/50'}`}
     >
-      <View className="flex-row p-4">
-        {/* Unread indicator dot */}
+      <View className="flex-row items-start px-4 py-3">
+        {/* Unread indicator dot - Larger and better positioned */}
         {!notification.isRead && (
-          <View className="absolute left-2 top-1/2 -translate-y-1/2">
-            <View className="size-2 rounded-full bg-blue-500" />
+          <View className="pt-2 pr-2">
+            <View className="size-2.5 rounded-full bg-blue-500" />
           </View>
         )}
 
-        <View className="relative mr-3 ml-2">
+        {/* Profile Picture with Icon Badge */}
+        <View className="relative mr-3">
           <Image
             source={{ uri: notification.from.profilePicture }}
-            className="size-12 rounded-full"
+            className="size-12 rounded-full bg-gray-200"
           />
-
-          <View className="absolute -bottom-1 -right-1 size-6 rounded-full bg-white items-center justify-center shadow-sm">
-            {getNotificationIcon()}
+          
+          {/* Icon Badge - Better positioning and sizing */}
+          <View 
+            className="absolute -bottom-0.5 -right-0.5 size-7 rounded-full items-center justify-center border-2 border-white"
+            style={{ backgroundColor: iconConfig.bg }}
+          >
+            <Feather name={iconConfig.icon as any} size={14} color={iconConfig.color} />
           </View>
         </View>
 
-        <View className="flex-1">
+        {/* Content */}
+        <View className="flex-1 pt-0.5">
           <View className="flex-row items-start justify-between mb-1">
-            <View className="flex-1">
-              <Text className="text-gray-900 text-base leading-5 mb-1">
-                <Text className={`font-semibold ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
+            <View className="flex-1 pr-2">
+              <Text className="text-gray-900 leading-5">
+                <Text className={`font-semibold text-[15px] ${!notification.isRead ? 'text-gray-900' : 'text-gray-800'}`}>
                   {notification.from.firstName} {notification.from.lastName}
                 </Text>
-                <Text className="text-gray-500"> @{notification.from.username}</Text>
+                <Text className="text-gray-500 text-[15px]"> {getNotificationText()}</Text>
               </Text>
-              <Text className={`text-sm mb-2 ${!notification.isRead ? 'text-gray-800 font-medium' : 'text-gray-700'}`}>
-                {getNotificationText()}
+              
+              <Text className="text-gray-400 text-xs mt-0.5">
+                @{notification.from.username} · {formatDate(notification.createdAt)}
               </Text>
             </View>
 
-            <TouchableOpacity className="ml-2 p-1" onPress={handleDelete}>
-              <Feather name="trash" size={16} color="#E0245E" />
+            {/* Delete Button */}
+            <TouchableOpacity 
+              className="p-2 -mr-2 -mt-1" 
+              onPress={handleDelete}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Feather name="x" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
 
+          {/* Post Preview */}
           {notification.post && (
-            <View className="bg-gray-50 rounded-lg p-3 mb-2">
-              <Text className="text-gray-700 text-sm mb-1" numberOfLines={3}>
+            <View className="bg-gray-50 border border-gray-100 rounded-xl p-3 mt-2">
+              <Text className="text-gray-700 text-[13px] leading-5" numberOfLines={3}>
                 {notification.post.content}
               </Text>
               {notification.post.image && (
                 <Image
                   source={{ uri: notification.post.image }}
-                  className="w-full h-32 rounded-lg mt-2"
+                  className="w-full h-32 rounded-lg mt-2 bg-gray-200"
                   resizeMode="cover"
                 />
               )}
             </View>
           )}
 
+          {/* Comment Preview */}
           {notification.comment && (
-            <View className="bg-blue-50 rounded-lg p-3 mb-2">
-              <Text className="text-gray-600 text-xs mb-1">Comment:</Text>
-              <Text className="text-gray-700 text-sm" numberOfLines={2}>
+            <View className="bg-blue-50/80 border border-blue-100 rounded-xl p-3 mt-2">
+              <View className="flex-row items-center mb-1">
+                <Feather name="message-square" size={12} color="#60A5FA" />
+                <Text className="text-blue-600 text-xs font-medium ml-1">Comment</Text>
+              </View>
+              <Text className="text-gray-700 text-[13px] leading-5" numberOfLines={2}>
                 &ldquo;{notification.comment.content}&rdquo;
               </Text>
             </View>
           )}
-
-          <View className="flex-row items-center justify-between">
-            <Text className="text-gray-400 text-xs">{formatDate(notification.createdAt)}</Text>
-            
-            {!notification.isRead && (
-              <View className="flex-row items-center">
-                <View className="size-1.5 rounded-full bg-blue-500 mr-1" />
-                <Text className="text-blue-600 text-xs font-medium">New</Text>
-              </View>
-            )}
-          </View>
         </View>
       </View>
     </TouchableOpacity>
