@@ -7,14 +7,21 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const api_key = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+const auth_domain = process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN;
+const project_id = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+const storage_bucket = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET;
+const messaging_sender_id = process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID;
+const app_id = process.env.EXPO_PUBLIC_FIREBASE_APP_ID;
+const measurement_id = process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID;
 const firebaseConfig = {
-  apiKey: "AIzaSyAEm59qPLmPoJl4Q3mJn8bRSJUIbycl3QQ",
-  authDomain: "twitter-clone-fa852.firebaseapp.com",
-  projectId: "twitter-clone-fa852",
-  storageBucket: "twitter-clone-fa852.firebasestorage.app",
-  messagingSenderId: "349071256023",
-  appId: "1:349071256023:web:69505bc54df36507f08392",
-  measurementId: "G-T7WNHG25YQ"
+  apiKey: api_key,
+  authDomain: auth_domain,
+  projectId: project_id,
+  storageBucket: storage_bucket,
+  messagingSenderId: messaging_sender_id,
+  appId: app_id,
+  measurementId: measurement_id
 };
 
 // Initialize Firebase

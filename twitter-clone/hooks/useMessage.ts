@@ -29,7 +29,7 @@ export const useMessage = (myUserId: string, otherUserId: string) => {
   useEffect(() => {
     if (!myUserId || !otherUserId) return;
 
-    // Create a query to get messages between the two users
+    
     const messagesRef = collection(db, "messages");
     const q = query(
       messagesRef,
@@ -61,7 +61,7 @@ export const useMessage = (myUserId: string, otherUserId: string) => {
       setMessages(messagesData);
     });
 
-    // Cleanup subscription on unmount
+    // Cleanup 
     return () => unsubscribe();
   }, [myUserId, otherUserId]);
 
